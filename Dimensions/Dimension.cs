@@ -3,12 +3,12 @@ using System.Linq;
 using Godot;
 using Godot.Collections;
 
-namespace Again.Dimensions;
+namespace Dim.Dimensions;
 
 public partial class Dimension : TextureRect
 {
-	private int _dimOrder;
-	private SubViewport _subViewportRoot;
+	public int _dimOrder;
+	public SubViewport _subViewportRoot;
 	public Array<StartingDimensionRule> _startingRules = new Array<StartingDimensionRule>();
 	public Array<DuringDimensionRule> _duringRules = new Array<DuringDimensionRule>();
 
@@ -59,7 +59,7 @@ public partial class Dimension : TextureRect
 				? DisplayServer.ScreenGetSize() 
 				: DisplayServer.WindowGetSize();
 			
-			Size = windowSize;
+			CustomMinimumSize = windowSize;
 			_subViewportRoot.Size = windowSize;
 			Texture = _subViewportRoot.GetTexture();
 		}
@@ -72,15 +72,7 @@ public partial class Dimension : TextureRect
 	public void defineRules()
 	{
 		
-		switch (_dimOrder)
-		{
-			case 0:
-				_startingRules.Add(new UnifiedColorScreenDimensionRule(_subViewportRoot,Colors.Black));
-				break;
-			case 1:
-				_startingRules.Add(new UnifiedColorScreenDimensionRule(_subViewportRoot,Colors.Red));
-				break;
-		}
+	
 	}
 
 

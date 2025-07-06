@@ -1,15 +1,12 @@
-﻿using Again.Utils;
-using Godot;
+﻿using Godot;
 
-namespace Again.Dimensions;
+namespace Dim.Dimensions.SpecificRules;
 
+[GlobalClass]
 public partial class UnifiedColorScreenDimensionRule : StartingDimensionRule
 {
-    private Color _chosenColor;
-    public UnifiedColorScreenDimensionRule(SubViewport subViewportRo,Color chosenColor):base(subViewportRo)
-    {
-        _chosenColor = chosenColor;
-    }
+    [Export] public Color ChosenColor { get; set; } = new Color ();// blanc par défaut
+
 
 
 
@@ -21,7 +18,7 @@ public partial class UnifiedColorScreenDimensionRule : StartingDimensionRule
             return;
         }
 
-        GD.Print($"Application de la couleur {_chosenColor} à la dimension");
+        GD.Print($"Application de la couleur {ChosenColor} à la dimension");
 
         // Supprimer l'ancien ColorRect s'il existe
         var existingColorRect = _subViewportRoot.GetNodeOrNull<ColorRect>("BackgroundColor");
@@ -34,7 +31,7 @@ public partial class UnifiedColorScreenDimensionRule : StartingDimensionRule
         var colorRect = new ColorRect
         {
             Name = "BackgroundColor",
-            Color = _chosenColor,
+            Color = ChosenColor,
             ZIndex = -1, // S'assure qu'il est derrière tout
             LayoutMode = 1, // Mode layout proportionnel
             AnchorsPreset = (int)Control.LayoutPreset.FullRect, // Remplit tout l'espace

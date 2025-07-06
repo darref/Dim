@@ -1,10 +1,8 @@
 ﻿using Godot;
 
-namespace Again.Utils;
+namespace Dim.Utils;
 
-public struct Signals
+public static class Signals
 {
-    public static Signal toggleFullscreenSignal = new();
-
-
+    public static readonly StringName ToggleFullscreen = "toggle_fullscreen";
 }

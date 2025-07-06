@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Again.Utils;
+namespace Dim.Utils;
 
 public static class NodeManagement
 {

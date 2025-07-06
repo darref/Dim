@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Again.Datas;
+namespace Dim.Datas;
 
 [GlobalClass]
 public partial class AudioStreamEntry : Resource

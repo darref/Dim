@@ -1,19 +1,9 @@
 ﻿using Godot;
 
-namespace Again.Dimensions;
+namespace Dim.Dimensions;
 
-public partial  class DuringDimensionRule : DimensionRule
+public abstract partial  class DuringDimensionRule : DimensionRule
 {
-    public DuringDimensionRule(SubViewport subViewportRoot) : base(subViewportRoot)
-    {
-        
-    }
-    public virtual void StartApplying()
-    {
-        
-    }
-    public virtual void PauseApplying()
-    {
-        
-    }
+    public abstract void StartApplying();
+    public abstract void PauseApplying();
 }

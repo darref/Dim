@@ -1,6 +1,7 @@
+using Dim.Utils;
 using Godot;
 
-namespace Again.Scripts;
+namespace Dim.Scripts;
 
 public partial class WindowManager : Node
 {
@@ -18,12 +19,13 @@ public partial class WindowManager : Node
 		{
 			ToggleFullscreen();
 			
+			
 			// Si on passe en mode fenêtré, ajuster la taille
 			if (DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Windowed)
 			{
 				AjusterTailleFenetre();
 			}
-			EmitSignal(Utils.Signals.toggleFullscreenSignal.Name, DisplayServer.WindowGetMode().ToString());
+			
 		}
 	}
 
@@ -53,7 +55,6 @@ public partial class WindowManager : Node
 
 	public void ToggleFullscreen()
 	{
-		// Bascule entre le mode plein écran et fenêtré
 		if (DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Fullscreen)
 		{
 			DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
@@ -62,5 +63,10 @@ public partial class WindowManager : Node
 		{
 			DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
 		}
+		EventBus.EmitToggleFullscreen();
+
+
+
 	}
+
 }

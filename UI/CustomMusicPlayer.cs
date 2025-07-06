@@ -1,8 +1,8 @@
 using Godot;
 using Godot.Collections;
-using Again.Datas;
+using Dim.Datas;
 
-namespace Again.Scripts;
+namespace Dim.Scripts;
 
 public partial class CustomMusicPlayer : Node
 {

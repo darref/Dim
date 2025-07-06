@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Again.Utils;
+namespace Dim.Utils;
 
 public static class MathUtils
 {

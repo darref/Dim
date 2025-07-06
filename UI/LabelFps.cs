@@ -1,7 +1,7 @@
-using Again.Utils;
+using Dim.Utils;
 using Godot;
 
-namespace Again.UI;
+namespace Dim.UI;
 
 public partial class LabelFps : Label
 {

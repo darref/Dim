@@ -15,6 +15,10 @@ run/main_scene="uid://b3m62euhg60nc"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+EventBus="*res://Utils/EventBus.cs"
+
 [display]
 
 window/size/viewport_width=1920

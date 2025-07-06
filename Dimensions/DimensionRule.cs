@@ -1,14 +1,16 @@
 ﻿using Godot;
 
-namespace Again.Dimensions;
+namespace Dim.Dimensions;
 
-public partial class DimensionRule : Node
+public abstract partial class DimensionRule : Resource
 {
     protected  SubViewport _subViewportRoot;
-    public DimensionRule(SubViewport subViewportRoot)
+
+    public void Init(SubViewport subViewportRoot)
     {
-        GD.Print("Initilizing new DimensionRule");
         _subViewportRoot = subViewportRoot;
     }
+
+
     
 }
