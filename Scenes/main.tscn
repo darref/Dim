@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://b3m62euhg60nc"]
+
+[ext_resource type="Script" uid="uid://df4aggtdv3w34" path="res://Scripts/Main.cs" id="1_jjgbg"]
+[ext_resource type="Script" uid="uid://cy70176asvnae" path="res://Scripts/WindowManager.cs" id="2_8gbba"]
+[ext_resource type="Script" uid="uid://bi3vcato3uwyn" path="res://UI/DimensionsManager.cs" id="3_jjvhh"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_jjgbg")
+
+[node name="General" type="Node" parent="."]
+
+[node name="WindowManager" type="Node" parent="General"]
+script = ExtResource("2_8gbba")
+
+[node name="DimensionsManager" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_jjvhh")

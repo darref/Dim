@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8l33xllb6c58"]
+
+[ext_resource type="Script" uid="uid://caw0jacl0rw41" path="res://Dimensions/Dimension.cs" id="1_rt3q1"]
+
+[node name="Dimension" type="TextureRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rt3q1")
+metadata/_edit_use_anchors_ = true
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(1920, 1080)
