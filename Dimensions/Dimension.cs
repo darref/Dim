@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Dim.Rules;
 using Godot;
 using Godot.Collections;
 
@@ -9,8 +10,8 @@ public partial class Dimension : TextureRect
 {
 	public int _dimOrder;
 	public SubViewport _subViewportRoot;
-	public Array<StartingDimensionRule> _startingRules = new Array<StartingDimensionRule>();
-	public Array<DuringDimensionRule> _duringRules = new Array<DuringDimensionRule>();
+	public Array<DimensionRule> _dimensionRules = new ();
+
 
 	public void Init(int dim)
 	{
@@ -53,6 +54,7 @@ public partial class Dimension : TextureRect
 					Position = new Vector3(0, 0, 10) // Position par défaut pour voir la scène
 				};
 				_subViewportRoot.AddChild(camera3D);
+				camera3D.LookAtFromPosition(camera3D.Position ,new Vector3(0,0,50));
 			}
 
 			Vector2I windowSize = DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Fullscreen 
@@ -69,24 +71,8 @@ public partial class Dimension : TextureRect
 		}
 	}
 
-	public void defineRules()
-	{
-		
-	
-	}
 
 
 
-	public void applyRules()
-	{
-		foreach (var startrule in _startingRules)
-		{
-			startrule.Apply();
-		}
-		foreach (var duringrule in _duringRules)
-		{
-			duringrule.StartApplying();
-		}
-	}
 
 }

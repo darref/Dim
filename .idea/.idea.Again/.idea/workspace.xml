@@ -5,28 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5efaf34f-2732-43c1-a76d-8daa85b20e7b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Dimensions/LawEntryByOrder.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dimensions/LawsEntry.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Utils/EventBus.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Again.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Dim.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Datas/AudioStreamEntry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Datas/AudioStreamEntry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dim.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Dim.sln" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dimensions/SpecificRules/AddACubeDimensionRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Again/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Again/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dimensions/Dimension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dimensions/Dimension.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dimensions/DimensionRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dimensions/DimensionRule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dimensions/DuringDimensionRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dimensions/DuringDimensionRule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dimensions/StartingDimensionRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dimensions/StartingDimensionRule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dimensions/UnifiedColorScreenDimensionRule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dimensions/UnifiedColorScreenDimensionRule.cs.uid" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Scenes/main.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/Scenes/main.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Scripts/Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/Main.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Scripts/WindowManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/WindowManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/CustomMusicPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UI/CustomMusicPlayer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/DimensionsManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UI/DimensionsManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/LabelFps.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LabelFps.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utils/MathUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/MathUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utils/NodeManagement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/NodeManagement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utils/Signals.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/Signals.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +109,7 @@
       <updated>1751709557018</updated>
       <workItem from="1751709559700" duration="1618000" />
       <workItem from="1751713986960" duration="33445000" />
-      <workItem from="1751819219660" duration="16857000" />
+      <workItem from="1751819219660" duration="19785000" />
     </task>
     <servers />
   </component>

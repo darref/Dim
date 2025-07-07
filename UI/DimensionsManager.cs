@@ -5,6 +5,7 @@ using Dim.Dimensions;
 using Dim.Utils;
 using Godot;
 using Godot.Collections;
+using DimensionRule = Dim.Rules.DimensionRule;
 
 namespace Dim.UI;
 
@@ -59,6 +60,8 @@ public partial class DimensionsManager : Control
 		_dimensionScene = GD.Load<PackedScene>(DIMENSION_SCENE_PATH);
 		AddNewDimension(0);
 		AddNewDimension(1);
+		AddNewDimension(2);
+		AddNewDimension(3);
 
 		//audio
 		if (EntriesAmbiance.Count != 0 && EntriesMusic.Count != 0)
@@ -133,11 +136,10 @@ public partial class DimensionsManager : Control
 
 		dimension.Init(dim);
 		addLawsToDimension(dimension);
-		dimension.defineRules();
-		dimension.applyRules();
 		_viewContainer.AddChild(dimension);
 		_dimensions.Add(dimension);
 		UpdateLayout();
+		GD.Print($"Dimension " + dim + " créée etajoutée");
 	}
 
 
@@ -177,17 +179,11 @@ public partial class DimensionsManager : Control
 							GD.PrintErr("Échec de la duplication de la règle");
 							continue;
 						}
-
-						if (lawInstance is StartingDimensionRule sdr)
-						{
-							sdr.Init(dimension._subViewportRoot);
-							dimension._startingRules.Add(sdr);
-						}
-						else if (lawInstance is DuringDimensionRule ddr)
-						{
-							ddr.Init(dimension._subViewportRoot);
-							dimension._duringRules.Add(ddr);
-						}
+						// /!\
+						lawInstance.Init(dimension._subViewportRoot,dimension._dimOrder,lawEntry._applyOnStart,lawEntry._applyOnEnd,lawEntry._applyPermanently);
+						dimension._dimensionRules.Add(lawInstance);
+						//
+	
 					}
 					catch (Exception e)
 					{
@@ -234,7 +230,6 @@ public partial class DimensionsManager : Control
 	{
 		if (isSlideDisabled) return;
 
-
 		if (@event is InputEventJoypadMotion btn && btn.GetAxisValue() > 0.8f)
 		{
 			if (btn.GetAxis() == JoyAxis.TriggerLeft)
@@ -243,10 +238,9 @@ public partial class DimensionsManager : Control
 			}
 			else if (btn.GetAxis() == JoyAxis.TriggerRight)
 			{
-				if (currentIndex < 2) SlideToView(currentIndex + 1);
+				if (currentIndex < _dimensions.Count - 1) // Utiliser le nombre réel de dimensions
+					SlideToView(currentIndex + 1);
 			}
-
-			GD.Print("Input detected on DimensionsManager");
 		}
 		else if (@event is InputEventKey btnPC && btnPC.Pressed)
 		{
@@ -255,9 +249,8 @@ public partial class DimensionsManager : Control
 					SlideToView(currentIndex - 1);
 
 			if (btnPC.Keycode == Key.Right)
-				if (currentIndex < 2)
+				if (currentIndex < _dimensions.Count - 1) // Utiliser le nombre réel de dimensions
 					SlideToView(currentIndex + 1);
-			GD.Print("Input detected on DimensionsManager");
 		}
 	}
 
