@@ -137,4 +137,4 @@ offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_jjvhh")
-lawOrders = Array[ExtResource("4_kry3j")]([SubResource("Resource_344ge"), SubResource("Resource_d1ilt"), SubResource("Resource_jkdf5"), SubResource("Resource_h1bgf"), SubResource("Resource_ee4r6"), null, null])
+lawOrders = Array[ExtResource("4_kry3j")]([SubResource("Resource_344ge"), SubResource("Resource_d1ilt"), SubResource("Resource_jkdf5"), SubResource("Resource_h1bgf"), SubResource("Resource_ee4r6")])
