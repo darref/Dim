@@ -18,9 +18,7 @@ public partial class Dimension : TextureRect
 		_dimOrder = dim;
 		Name = $"{_dimOrder}D";
 		
-		// Configuration du layout
-		LayoutMode = 1;
-		AnchorsPreset = (int)LayoutPreset.FullRect;
+		
 		
 		_subViewportRoot = GetNode("SubViewport") as SubViewport;
 		if (_subViewportRoot != null)
@@ -41,7 +39,8 @@ public partial class Dimension : TextureRect
 					Name = "MainCamera",
 					Enabled = true,
 					Position = Vector2.Zero,
-					AnchorMode = Camera2D.AnchorModeEnum.FixedTopLeft
+					AnchorMode = Camera2D.AnchorModeEnum.FixedTopLeft,
+					CustomViewport = _subViewportRoot
 				};
 				_subViewportRoot.AddChild(camera2D);
 			}
@@ -51,18 +50,12 @@ public partial class Dimension : TextureRect
 				{
 					Name = "MainCamera",
 					Current = true,
-					Position = new Vector3(0, 0, 10) // Position par défaut pour voir la scène
+					Position = new Vector3(0, 0, 10)
 				};
 				_subViewportRoot.AddChild(camera3D);
 				camera3D.LookAtFromPosition(camera3D.Position ,new Vector3(0,0,50));
 			}
-
-			Vector2I windowSize = DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Fullscreen 
-				? DisplayServer.ScreenGetSize() 
-				: DisplayServer.WindowGetSize();
 			
-			CustomMinimumSize = windowSize;
-			_subViewportRoot.Size = windowSize;
 			Texture = _subViewportRoot.GetTexture();
 		}
 		else

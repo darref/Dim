@@ -14,6 +14,9 @@ public partial class EventBus : Node
     }
     //
     public static event Action OnToggleFullscreen;
-    public static void EmitToggleFullscreen() { OnToggleFullscreen?.Invoke(); }
+    public static void EmitToggleFullscreen()
+    {
+        OnToggleFullscreen?.Invoke();
+    }
     //
 }

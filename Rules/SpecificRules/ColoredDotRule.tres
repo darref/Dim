@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ColoredDotRule" load_steps=2 format=3 uid="uid://cdjek03850r3l"]
+
+[ext_resource type="Script" uid="uid://dtl5b1n57o1kw" path="res://Rules/SpecificRules/ColoredDotRule.cs" id="1_o1u64"]
+
+[resource]
+script = ExtResource("1_o1u64")
+DotColor = Color(0, 0, 0, 1)

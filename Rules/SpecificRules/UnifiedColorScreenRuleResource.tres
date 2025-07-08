@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="UnifiedColorScreenRule" load_steps=2 format=3 uid="uid://b18ac1ut0nhuw"]
+
+[ext_resource type="Script" uid="uid://c2wp4rxrwv1nr" path="res://Rules/SpecificRules/UnifiedColorScreenRule.cs" id="1_e8tfm"]
+
+[resource]
+script = ExtResource("1_e8tfm")
+ChosenColor = Color(0, 0, 0, 1)
