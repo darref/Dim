@@ -23,7 +23,7 @@ public partial class WindowManager : Node
         // Timer pour détecter la fin du redimensionnement
         _resizeEndTimer = new Timer
         {
-            WaitTime = 0.7f,
+            WaitTime = 0.3f,
             OneShot = true,
             Autostart = false
         };

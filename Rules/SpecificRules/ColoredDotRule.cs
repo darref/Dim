@@ -30,5 +30,7 @@ public partial class ColoredDotRule : DimensionRule
         };
 
         _subViewportRoot.AddChild(dot);
+        
+        GD.Print($"{GetType().Name} appliqué a la dimension {_dimOrder}.");
     }
 }
