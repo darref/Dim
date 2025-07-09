@@ -64,6 +64,12 @@ public partial class Dimension : TextureRect
 		}
 	}
 
+	public bool AddLRuleIfNotAlreadyContained(DimensionRule rule)
+	{
+		if(_dimensionRules.Where(r => r.ResourceName == rule.ResourceName).Any()) return false;
+		_dimensionRules.Add(rule);
+		return true;
+	}
 
 
 

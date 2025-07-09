@@ -10,47 +10,33 @@ public partial class RecordMouseMotion : DimensionRule
     private Line2D _line;
     private readonly List<Vector2> _recordedPoints = new();
     [Export] public Color LineColor { get; set; } = new(0.5f, 0.5f, 0.5f);
-    [Export] public bool doesDeletingLineDestroyHigherDimensions { get; set; }
-    [Export] public MouseButton mouseButtonForEndRecording { get; set; } = MouseButton.Left;
-    [Export] public MouseButton mouseButtonForResetRecording { get; set; } = MouseButton.Right;
+    [Export] public bool DoesDeletingLineDestroyHigherDimensions { get; set; }
+    [Export] public MouseButton MouseButtonForEndRecording { get; set; } = MouseButton.Left;
+    [Export] public MouseButton MouseButtonForResetRecording { get; set; } = MouseButton.Right;
 
 
-    public override void ApplyPonctually()
+    protected override void DefineCommonHelperNodeMethods()
     {
-        
-    }
-
-    public override void DefineCommonNodeMethods()
-    {
-        _helperNode.Name = "HelperFor" + GetType().Name;
-        _helperNode.OnInput = e =>
+        HelperNode.OnInput += e =>
         {
-            if (_dimensionNode == null) return;
-
             if (e is InputEventMouseMotion motion)
             {
                 var globalPos = motion.Position;
                 _recordedPoints.Add(globalPos);
             }
-
-
             if (e is InputEventMouseButton mouseButton && mouseButton.Pressed)
             {
-                if (mouseButton.ButtonIndex == mouseButtonForEndRecording)
-                    FinalizeRecording();
-                else if (mouseButton.ButtonIndex == mouseButtonForResetRecording)
-                    ResetRecording();
+                if (mouseButton.ButtonIndex == MouseButtonForEndRecording)
+                    ApplyPonctually();
+                else if (mouseButton.ButtonIndex == MouseButtonForResetRecording)
+                    UnApplyPonctually();
             }
         };
-        _helperNode.OnReady = () =>
+        HelperNode.OnReady += () =>
         {
-            _applyPermanently = false;
-            _applyOnEnd = false;
-            _applyOnStart = true;
-            //
-            if (_subViewportRoot == null) return;
-            // Message de bienvenue
-
+            ApplyPermanently = false;
+            ApplyOnEnd = false;
+            ApplyOnStart = true;
             // Initialise la ligne
             _line = new Line2D
             {
@@ -59,25 +45,20 @@ public partial class RecordMouseMotion : DimensionRule
                 Antialiased = true,
                 Visible = false
             };
-            _dimensionNode.AddChild(_line);
-
+            DimensionNode.AddChild(_line);
             // Centre initial de la souris
-            var center = _subViewportRoot.Size / 2;
+            var center = SubViewportRoot.Size / 2;
             Input.WarpMouse(center);
-
             // Connecte le signal de mouvement de souris (sur `_dimensionNode`)
-            _dimensionNode.Connect("mouse_entered", Callable.From(() => { _dimensionNode.SetProcessInput(true); }));
-
-            _dimensionNode.SetProcess(true);
-            _dimensionNode.SetProcessInput(true);
-            
-            base.ValidationMessageConsole();
+            DimensionNode.Connect("mouse_entered", Callable.From(() => { DimensionNode.SetProcessInput(true); }));
+            DimensionNode.SetProcess(true);
+            DimensionNode.SetProcessInput(true);
         };
         
     }
 
 
-    public void FinalizeRecording()
+    protected override void ApplyPonctually()
     {
         if (_recordedPoints.Count < 2 || _line == null)
         {
@@ -93,7 +74,7 @@ public partial class RecordMouseMotion : DimensionRule
         // TODO : ajouter algorithme de lissage si besoin
     }
 
-    public void ResetRecording()
+    protected override void UnApplyPonctually()
     {
         _recordedPoints.Clear();
         if (_line != null)

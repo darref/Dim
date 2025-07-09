@@ -5,37 +5,62 @@ namespace Dim.Rules.SpecificRules;
 [GlobalClass]
 public partial class ColoredDotRule : DimensionRule
 {
-    [Export] public Color DotColor { get; set; } = new Color(1, 0, 0); // Rouge par défaut
-    
-    public override void ApplyPonctually()
+    private ColorRect _dot;
+    private bool _done;
+    [Export] public Color DotColor { get; set; } = new(1, 0, 0); // Rouge par défaut
+    [Export] private bool OneShot { get; set; }
+    [Export] public MouseButton MouseButtonForApplyingDot { get; set; } = MouseButton.Left;
+    [Export] public MouseButton MouseButtonForDeletingDot { get; set; } = MouseButton.Right;
+
+    protected override void DefineCommonHelperNodeMethods()
     {
-        if (_subViewportRoot == null) return;
-
-        var existingDot = _subViewportRoot.GetNodeOrNull<ColorRect>("CenteredDot");
-        if (existingDot != null)
+        HelperNode.OnReady += () =>
         {
-            existingDot.QueueFree();
-        }
+            ApplyPermanently = false;
+            ApplyOnEnd = false;
+            ApplyOnStart = false;
+            //
+            if (SubViewportRoot == null) return;
+            // Centre initial de la souris
+            var center = SubViewportRoot.Size / 2;
+            Input.WarpMouse(center);
+            // Activer les InputEvents
+            DimensionNode.SetProcessInput(true);
+        };
+        HelperNode.OnInput += e =>
+        {
+            if (e is InputEventMouseButton mouseButton && mouseButton.Pressed)
+            {
+                if (mouseButton.ButtonIndex == MouseButtonForApplyingDot)
+                    ApplyPonctually();
+                if (mouseButton.ButtonIndex == MouseButtonForDeletingDot)
+                    UnApplyPonctually();
+            }
+        };
+    }
 
-        // Utiliser la taille réelle de la fenêtre
-        var viewportSize = DisplayServer.WindowGetSize();
-        
+
+    protected override void ApplyPonctually()
+    {
+        if (OneShot && _done) return;
+        if (_dot != null) return;
         var dot = new ColorRect
         {
             Name = "CenteredDot",
             Color = DotColor,
             Size = new Vector2(20, 20),
-            // Centrer par rapport à la taille réelle de la fenêtre
-            Position = (Vector2)viewportSize / 2 - new Vector2(10, 10)
+            Position = DisplayServer.MouseGetPosition()
         };
-
-        _subViewportRoot.AddChild(dot);
-        
-        base.ValidationMessageConsole();
+        _dot = dot;
+        SubViewportRoot.AddChild(dot);
+        _done = true;
     }
 
-    public override void DefineCommonNodeMethods()
+    protected override void UnApplyPonctually()
     {
-        
+        if (_dot == null) return;
+        if (OneShot) return;
+        _dot.QueueFree();
+        _dot = null;
     }
 }

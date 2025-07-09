@@ -21,31 +21,32 @@ public enum EnumDimensionSwitchingMode
 public partial class DimensionsManager : Control
 {
 	// base scene
-	private const string DIMENSION_SCENE_PATH = "res://Dimensions/dimension.tscn";
+	private const string DimensionScenePath = "res://Dimensions/dimension.tscn";
 
 	// dim
 	private readonly List<Dimension> _dimensions = new();
-	public EnumDimensionSwitchingMode _dimensionChangeMode = EnumDimensionSwitchingMode.Fade;
+	public EnumDimensionSwitchingMode DimensionChangeMode = EnumDimensionSwitchingMode.Fade;
 	private PackedScene _dimensionScene;
 	private bool _enabledNavigation = true;
 
 	// slider
 	private Control _viewContainer;
-	private AudioStreamPlayer2D audioPlayer = new();
-	private AudioStreamPlayer2D audioPlayerAmbiance = new();
-	public int currentIndex;
+	private AudioStreamPlayer2D _audioPlayer = new();
+	private AudioStreamPlayer2D _audioPlayerAmbiance = new();
+	public int CurrentIndex;
 
-	private bool IsChangingView;
+	private bool _isChangingView;
 
 	// laws
-	[Export] public Array<LawEntriesByOrder> lawOrders { get; set; } = new();
+	[Export] public Array<LawEntriesByOrder> LawOrders { get; set; } = new();
+	[Export] public Array<LawEntry>   TransdimensionalLaws { get; set; } = new ();
 	[Export] public Array<AudioStreamEntry> EntriesMusic { get; set; } = new();
 	[Export] public Array<AudioStreamEntry> EntriesAmbiance { get; set; } = new();
 
 	public void UpdateLayoutGeneral()
 	{
 		_dimensions.Sort((a, b) => a._dimOrder.CompareTo(b._dimOrder));
-		switch (_dimensionChangeMode)
+		switch (DimensionChangeMode)
 		{
 			case EnumDimensionSwitchingMode.Slide:
 				UpdateLayoutSliderMode();
@@ -70,14 +71,14 @@ public partial class DimensionsManager : Control
 		};
 		AddChild(_viewContainer);
 
-		_dimensionScene = GD.Load<PackedScene>(DIMENSION_SCENE_PATH);
+		_dimensionScene = GD.Load<PackedScene>(DimensionScenePath);
 		//créer les dimensions
-		if (lawOrders == null)
+		if (LawOrders == null)
 		{
 			GD.PrintErr("lawOrders est null !");
 			return;
 		}
-		foreach (var laworder in lawOrders)
+		foreach (var laworder in LawOrders)
 		{
 			if (laworder == null)
 			{
@@ -87,39 +88,48 @@ public partial class DimensionsManager : Control
 
 			AddNewDimension(laworder.Order);
 		}
-
+		//
+		ApplyTransdimensionalLaws();
 		//musiques et ambiances
 		if (EntriesAmbiance.Count != 0 && EntriesMusic.Count != 0)
 		{
-			audioPlayer = new AudioStreamPlayer2D();
-			AddChild(audioPlayer);
-			audioPlayer.Stream = EntriesMusic[0]?.Stream;
-			audioPlayerAmbiance = new AudioStreamPlayer2D();
-			AddChild(audioPlayerAmbiance);
-			audioPlayerAmbiance.Stream = EntriesAmbiance[0]?.Stream;
-			audioPlayer.Play();
+			_audioPlayer = new AudioStreamPlayer2D();
+			AddChild(_audioPlayer);
+			_audioPlayer.Stream = EntriesMusic[0]?.Stream;
+			_audioPlayerAmbiance = new AudioStreamPlayer2D();
+			AddChild(_audioPlayerAmbiance);
+			_audioPlayerAmbiance.Stream = EntriesAmbiance[0]?.Stream;
+			_audioPlayer.Play();
 		}
 
 		InitChangingView();
 		UpdateLayoutGeneral();
-		ChangeView(currentIndex);
+		ChangeView(CurrentIndex);
+	}
+
+	private void ApplyTransdimensionalLaws()
+	{
+		foreach (var tLaw in TransdimensionalLaws)
+			foreach (var dimension in _dimensions)
+				dimension.AddLRuleIfNotAlreadyContained(tLaw.Duplicate() as DimensionRule);
+		
 	}
 
 	private void InitChangingView()
 	{
-		currentIndex = _dimensions[0]._dimOrder;
+		CurrentIndex = _dimensions[0]._dimOrder;
 		foreach (var dimension in _dimensions)
 		{
 			
-			switch (_dimensionChangeMode)
+			switch (DimensionChangeMode)
 			{
 				case EnumDimensionSwitchingMode.Slide:
 					dimension.ZIndex = 100;
 					dimension.Modulate = new Color(1, 1, 1, 1);
 					break;
 				case EnumDimensionSwitchingMode.Fade:
-					dimension.ZIndex = dimension._dimOrder == currentIndex ? 100 : 0;
-					dimension.Modulate = dimension._dimOrder == currentIndex?  new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0);
+					dimension.ZIndex = dimension._dimOrder == CurrentIndex ? 100 : 0;
+					dimension.Modulate = dimension._dimOrder == CurrentIndex?  new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0);
 					break;
 			}
 		}
@@ -129,7 +139,7 @@ public partial class DimensionsManager : Control
 
 	public void SetChangingDimensionMode(EnumDimensionSwitchingMode mode)
 	{
-		_dimensionChangeMode = mode;
+		DimensionChangeMode = mode;
 	}
 
 	private void UpdateLayoutSliderMode()
@@ -139,7 +149,7 @@ public partial class DimensionsManager : Control
 		Position = Vector2.Zero;
 		CustomMinimumSize = windowSize;
 
-		_viewContainer.Position = new Vector2(-currentIndex * windowSize.X, 0);
+		_viewContainer.Position = new Vector2(-CurrentIndex * windowSize.X, 0);
 		_viewContainer.CustomMinimumSize = new Vector2(windowSize.X * _dimensions.Count, windowSize.Y);
 
 		foreach (var dimension in _dimensions)
@@ -155,11 +165,11 @@ public partial class DimensionsManager : Control
 
 	public void SlideToView(int targetIndex)
 	{
-		if (!_enabledNavigation || IsChangingView )
+		if (!_enabledNavigation || _isChangingView )
 			return;
 
-		GD.Print($"Sliding Dimension from {currentIndex} to {targetIndex}");
-		IsChangingView = true;
+		GD.Print($"Sliding Dimension from {CurrentIndex} to {targetIndex}");
+		_isChangingView = true;
 		UpdateLayoutSliderMode();
 
 		var tween = CreateTween();
@@ -173,14 +183,14 @@ public partial class DimensionsManager : Control
 
 		tween.TweenCallback(Callable.From(() =>
 		{
-			currentIndex = targetIndex;
-			IsChangingView = false;
+			CurrentIndex = targetIndex;
+			_isChangingView = false;
 			if (EntriesMusic.Count > 0)
 			{
-				audioPlayer.Stream = EntriesMusic[currentIndex]?.Stream;
-				audioPlayerAmbiance.Stream = EntriesAmbiance[currentIndex]?.Stream;
-				audioPlayer.Play();
-				audioPlayerAmbiance.Play();
+				_audioPlayer.Stream = EntriesMusic[CurrentIndex]?.Stream;
+				_audioPlayerAmbiance.Stream = EntriesAmbiance[CurrentIndex]?.Stream;
+				_audioPlayer.Play();
+				_audioPlayerAmbiance.Play();
 			}
 		}));
 	}
@@ -202,34 +212,34 @@ public partial class DimensionsManager : Control
 
 	public void FadeToView(int targetIndex)
 	{
-		if (!_enabledNavigation || IsChangingView   )
+		if (!_enabledNavigation || _isChangingView   )
 			return;
 
-		IsChangingView = true;
-		GD.Print($"Fading Dimension from {currentIndex} to {targetIndex}");
+		_isChangingView = true;
+		GD.Print($"Fading Dimension from {CurrentIndex} to {targetIndex}");
 
 		UpdateLayoutFade();
 
 		// Forcer le zindex initial
 		for (var index = 0; index < _dimensions.Count; index++)
-			_dimensions[index].ZIndex = index == currentIndex || index == targetIndex ? 100 : 0;
+			_dimensions[index].ZIndex = index == CurrentIndex || index == targetIndex ? 100 : 0;
 		var tween = CreateTween();
 		// Crossfade propre
 		tween.TweenProperty(_dimensions[targetIndex], "modulate:a", 1.0f, 0.5);
-		tween.TweenProperty(_dimensions[currentIndex], "modulate:a", 0.0f, 0.5);
+		tween.TweenProperty(_dimensions[CurrentIndex], "modulate:a", 0.0f, 0.5);
 
 		tween.TweenCallback(Callable.From(() =>
 		{
-			currentIndex = targetIndex;
-			IsChangingView = false;
+			CurrentIndex = targetIndex;
+			_isChangingView = false;
 
 
 			if (EntriesMusic.Count > 0)
 			{
-				audioPlayer.Stream = EntriesMusic[currentIndex]?.Stream;
-				audioPlayerAmbiance.Stream = EntriesAmbiance[currentIndex]?.Stream;
-				audioPlayer.Play();
-				audioPlayerAmbiance.Play();
+				_audioPlayer.Stream = EntriesMusic[CurrentIndex]?.Stream;
+				_audioPlayerAmbiance.Stream = EntriesAmbiance[CurrentIndex]?.Stream;
+				_audioPlayer.Play();
+				_audioPlayerAmbiance.Play();
 			}
 		}));
 	}
@@ -239,24 +249,24 @@ public partial class DimensionsManager : Control
 	{
 		if (@event is InputEventJoypadMotion btn && btn.GetAxisValue() > 0.8f)
 		{
-			if (btn.GetAxis() == JoyAxis.TriggerLeft && currentIndex > 0)
-				ChangeView(currentIndex - 1);
-			else if (btn.GetAxis() == JoyAxis.TriggerRight && currentIndex < _dimensions.Count - 1)
-				ChangeView(currentIndex + 1);
+			if (btn.GetAxis() == JoyAxis.TriggerLeft && CurrentIndex > 0)
+				ChangeView(CurrentIndex - 1);
+			else if (btn.GetAxis() == JoyAxis.TriggerRight && CurrentIndex < _dimensions.Count - 1)
+				ChangeView(CurrentIndex + 1);
 		}
-		else if (@event is InputEventKey btnPC && btnPC.Pressed)
+		else if (@event is InputEventKey btnPc && btnPc.Pressed)
 		{
-			if (btnPC.Keycode == Key.Left && currentIndex > 0)
-				ChangeView(currentIndex - 1);
-			else if (btnPC.Keycode == Key.Right && currentIndex < _dimensions.Count - 1)
-				ChangeView(currentIndex + 1);
+			if (btnPc.Keycode == Key.Left && CurrentIndex > 0)
+				ChangeView(CurrentIndex - 1);
+			else if (btnPc.Keycode == Key.Right && CurrentIndex < _dimensions.Count - 1)
+				ChangeView(CurrentIndex + 1);
 		}
 	}
 
 	private void ChangeView(int targetIndex)
 	{
-		if (!_enabledNavigation || targetIndex == currentIndex) return;
-		switch (_dimensionChangeMode)
+		if (!_enabledNavigation || targetIndex == CurrentIndex) return;
+		switch (DimensionChangeMode)
 		{
 			case EnumDimensionSwitchingMode.Slide:
 				SlideToView(targetIndex);
@@ -282,16 +292,16 @@ public partial class DimensionsManager : Control
 		}
 
 		newDimension.Init(dim);
-		addLawsToDimension(newDimension);
+		AddLawsToDimension(newDimension);
 		_viewContainer.AddChild(newDimension);
 		_dimensions.Add(newDimension);
 	}
 
-	private void addLawsToDimension(Dimension dimension)
+	private void AddLawsToDimension(Dimension dimension)
 	{
-		if (lawOrders == null) return;
+		if (LawOrders == null) return;
 
-		foreach (var laworder in lawOrders)
+		foreach (var laworder in LawOrders)
 		{
 			if (laworder?.LawEntries == null) continue;
 
@@ -314,7 +324,7 @@ public partial class DimensionsManager : Control
 						lawEntry._applyPermanently
 					);
 
-					dimension._dimensionRules.Add(lawInstance);
+					dimension.AddLRuleIfNotAlreadyContained(lawInstance);
 				}
 				catch (Exception e)
 				{
