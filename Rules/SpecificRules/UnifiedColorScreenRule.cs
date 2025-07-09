@@ -8,7 +8,7 @@ public partial class UnifiedColorScreenRule : DimensionRule
 	[Export] public Color ChosenColor { get; set; } = new Color (1,1,1);// blanc par défaut
 
 
-	public override void ApplyNowPonctually()
+	public override void ApplyPonctually()
 	{
 
 		if (_subViewportRoot == null)
@@ -40,5 +40,12 @@ public partial class UnifiedColorScreenRule : DimensionRule
 		// Ajouter le ColorRect comme premier enfant du SubViewport
 		_subViewportRoot.AddChild(colorRect);
 		_subViewportRoot.MoveChild(colorRect, 0); // Le place en premier dans la hiérarchie
+		//
+		base.ValidationMessageConsole();
+	}
+
+	public override void DefineCommonNodeMethods()
+	{
+		
 	}
 }

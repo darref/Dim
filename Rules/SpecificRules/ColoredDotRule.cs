@@ -7,7 +7,7 @@ public partial class ColoredDotRule : DimensionRule
 {
     [Export] public Color DotColor { get; set; } = new Color(1, 0, 0); // Rouge par défaut
     
-    public override void ApplyNowPonctually()
+    public override void ApplyPonctually()
     {
         if (_subViewportRoot == null) return;
 
@@ -31,6 +31,11 @@ public partial class ColoredDotRule : DimensionRule
 
         _subViewportRoot.AddChild(dot);
         
-        GD.Print($"{GetType().Name} appliqué a la dimension {_dimOrder}.");
+        base.ValidationMessageConsole();
+    }
+
+    public override void DefineCommonNodeMethods()
+    {
+        
     }
 }

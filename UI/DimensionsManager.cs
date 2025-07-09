@@ -255,7 +255,7 @@ public partial class DimensionsManager : Control
 
 	private void ChangeView(int targetIndex)
 	{
-		if (!_enabledNavigation) return;
+		if (!_enabledNavigation || targetIndex == currentIndex) return;
 		switch (_dimensionChangeMode)
 		{
 			case EnumDimensionSwitchingMode.Slide:
@@ -304,11 +304,7 @@ public partial class DimensionsManager : Control
 				try
 				{
 					var lawInstance = lawEntry.Rule.Duplicate() as DimensionRule;
-					if (lawInstance == null)
-					{
-						GD.PrintErr("Échec de la duplication de la règle");
-						continue;
-					}
+					
 
 					lawInstance.Init(
 						dimension._subViewportRoot,
@@ -322,8 +318,9 @@ public partial class DimensionsManager : Control
 				}
 				catch (Exception e)
 				{
-					GD.PrintErr($"Erreur lors du chargement de la règle : {e.Message}");
+					GD.PrintErr($"Erreur lors de l’instanciation de la règle : {e.Message}");
 				}
+
 			}
 		}
 	}

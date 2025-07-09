@@ -1,21 +1,15 @@
-[gd_scene load_steps=26 format=3 uid="uid://b3m62euhg60nc"]
+[gd_scene load_steps=10 format=3 uid="uid://b3m62euhg60nc"]
 
 [ext_resource type="Script" uid="uid://df4aggtdv3w34" path="res://Scripts/Main.cs" id="1_jjgbg"]
 [ext_resource type="Script" uid="uid://bi3vcato3uwyn" path="res://UI/DimensionsManager.cs" id="3_jjvhh"]
+[ext_resource type="Resource" uid="uid://b18ac1ut0nhuw" path="res://Rules/SpecificRules/UnifiedColorScreenRuleResource.tres" id="4_21xkr"]
 [ext_resource type="Script" uid="uid://cw20givsw4vua" path="res://Rules/Laws/LawEntriesByOrder.cs" id="4_kry3j"]
-[ext_resource type="Script" uid="uid://c2wp4rxrwv1nr" path="res://Rules/SpecificRules/UnifiedColorScreenRule.cs" id="5_6bp64"]
 [ext_resource type="Script" uid="uid://cijoansvieaje" path="res://Rules/Laws/LawEntry.cs" id="5_21xkr"]
-[ext_resource type="Resource" uid="uid://cdjek03850r3l" path="res://Rules/SpecificRules/ColoredDotRule.tres" id="7_ynf5e"]
-[ext_resource type="Resource" uid="uid://b18ac1ut0nhuw" path="res://Rules/SpecificRules/UnifiedColorScreenRuleResource.tres" id="8_hptm8"]
-[ext_resource type="Script" uid="uid://dtl5b1n57o1kw" path="res://Rules/SpecificRules/ColoredDotRule.cs" id="9_d1ilt"]
-
-[sub_resource type="Resource" id="Resource_21xkr"]
-script = ExtResource("5_6bp64")
-ChosenColor = Color(0, 0, 0, 1)
+[ext_resource type="Resource" uid="uid://mm5n48dkaitw" path="res://Rules/SpecificRules/RecordMouseMotionResource.tres" id="6_21xkr"]
 
 [sub_resource type="Resource" id="Resource_6bp64"]
 script = ExtResource("5_21xkr")
-Rule = SubResource("Resource_21xkr")
+Rule = ExtResource("4_21xkr")
 Enabled = true
 _applyOnStart = true
 _applyOnEnd = false
@@ -23,103 +17,18 @@ _applyPermanently = false
 metadata/_custom_type_script = "uid://cijoansvieaje"
 
 [sub_resource type="Resource" id="Resource_344ge"]
+script = ExtResource("5_21xkr")
+Rule = ExtResource("6_21xkr")
+Enabled = true
+_applyOnStart = true
+_applyOnEnd = false
+_applyPermanently = false
+metadata/_custom_type_script = "uid://cijoansvieaje"
+
+[sub_resource type="Resource" id="Resource_8gbba"]
 script = ExtResource("4_kry3j")
 Order = 0
-LawEntries = Array[Object]([SubResource("Resource_6bp64")])
-metadata/_custom_type_script = "uid://cw20givsw4vua"
-
-[sub_resource type="Resource" id="Resource_ynf5e"]
-script = ExtResource("5_6bp64")
-ChosenColor = Color(1, 1, 1, 1)
-
-[sub_resource type="Resource" id="Resource_hptm8"]
-script = ExtResource("5_21xkr")
-Rule = SubResource("Resource_ynf5e")
-Enabled = true
-_applyOnStart = true
-_applyOnEnd = false
-_applyPermanently = false
-metadata/_custom_type_script = "uid://cijoansvieaje"
-
-[sub_resource type="Resource" id="Resource_b3802"]
-script = ExtResource("5_21xkr")
-Rule = ExtResource("7_ynf5e")
-Enabled = true
-_applyOnStart = true
-_applyOnEnd = false
-_applyPermanently = false
-metadata/_custom_type_script = "uid://cijoansvieaje"
-
-[sub_resource type="Resource" id="Resource_d1ilt"]
-script = ExtResource("4_kry3j")
-Order = 1
-LawEntries = Array[Object]([SubResource("Resource_hptm8"), SubResource("Resource_b3802")])
-metadata/_custom_type_script = "uid://cw20givsw4vua"
-
-[sub_resource type="Resource" id="Resource_6iyac"]
-script = ExtResource("5_6bp64")
-ChosenColor = Color(0.999943, 0.732586, 0.703165, 1)
-
-[sub_resource type="Resource" id="Resource_fdnlq"]
-script = ExtResource("5_21xkr")
-Rule = SubResource("Resource_6iyac")
-Enabled = true
-_applyOnStart = true
-_applyOnEnd = false
-_applyPermanently = false
-metadata/_custom_type_script = "uid://cijoansvieaje"
-
-[sub_resource type="Resource" id="Resource_jkdf5"]
-script = ExtResource("4_kry3j")
-Order = 2
-LawEntries = Array[Object]([SubResource("Resource_fdnlq")])
-metadata/_custom_type_script = "uid://cw20givsw4vua"
-
-[sub_resource type="Resource" id="Resource_wsu2k"]
-script = ExtResource("5_6bp64")
-ChosenColor = Color(0.480693, 0.901974, 0.682809, 1)
-
-[sub_resource type="Resource" id="Resource_k12tt"]
-script = ExtResource("5_21xkr")
-Rule = SubResource("Resource_wsu2k")
-Enabled = true
-_applyOnStart = true
-_applyOnEnd = false
-_applyPermanently = false
-metadata/_custom_type_script = "uid://cijoansvieaje"
-
-[sub_resource type="Resource" id="Resource_h1bgf"]
-script = ExtResource("4_kry3j")
-Order = 3
-LawEntries = Array[Object]([SubResource("Resource_k12tt")])
-metadata/_custom_type_script = "uid://cw20givsw4vua"
-
-[sub_resource type="Resource" id="Resource_fevyy"]
-script = ExtResource("5_21xkr")
-Rule = ExtResource("8_hptm8")
-Enabled = true
-_applyOnStart = true
-_applyOnEnd = false
-_applyPermanently = false
-metadata/_custom_type_script = "uid://cijoansvieaje"
-
-[sub_resource type="Resource" id="Resource_hibaj"]
-script = ExtResource("9_d1ilt")
-DotColor = Color(1, 1, 1, 1)
-
-[sub_resource type="Resource" id="Resource_pdsj5"]
-script = ExtResource("5_21xkr")
-Rule = SubResource("Resource_hibaj")
-Enabled = true
-_applyOnStart = true
-_applyOnEnd = false
-_applyPermanently = false
-metadata/_custom_type_script = "uid://cijoansvieaje"
-
-[sub_resource type="Resource" id="Resource_ee4r6"]
-script = ExtResource("4_kry3j")
-Order = -1
-LawEntries = Array[Object]([SubResource("Resource_fevyy"), SubResource("Resource_pdsj5")])
+LawEntries = Array[Object]([SubResource("Resource_6bp64"), SubResource("Resource_344ge")])
 metadata/_custom_type_script = "uid://cw20givsw4vua"
 
 [node name="Main" type="Node"]
@@ -137,4 +46,4 @@ offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_jjvhh")
-lawOrders = Array[ExtResource("4_kry3j")]([SubResource("Resource_344ge"), SubResource("Resource_d1ilt"), SubResource("Resource_jkdf5"), SubResource("Resource_h1bgf"), SubResource("Resource_ee4r6")])
+lawOrders = Array[ExtResource("4_kry3j")]([SubResource("Resource_8gbba")])

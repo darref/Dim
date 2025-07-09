@@ -1,9 +1,11 @@
+using Dim.Dimensions;
 using Godot;
 
 namespace Dim.Rules;
 
 public abstract partial class DimensionRule : Resource
 {
+	protected Dimension _dimensionNode;
 	protected  SubViewport _subViewportRoot;
 	protected int _dimOrder;
 	public bool _applyOnStart { get; set; } = false;
@@ -11,6 +13,7 @@ public abstract partial class DimensionRule : Resource
 	public bool _applyPermanently { get; set; } = false;
 	private float _permanentApplyingFrequency = 1;
 	private Timer _timerPermanentApplyingFrequency = new();
+	protected RuleCommonNodeMethodsHelper _helperNode ;
 
 	public void Init(SubViewport subViewportRoot , int dimOrder , bool applyOnStart = false , bool applyOnEnd = false  , bool applyPermanently = false , float permanentApplyingFrequency = 1)
 	{
@@ -20,27 +23,47 @@ public abstract partial class DimensionRule : Resource
 		_applyOnEnd = applyOnEnd;
 		_applyPermanently = applyPermanently;
 		_permanentApplyingFrequency = permanentApplyingFrequency;
-		//
-		if(_applyOnStart)ApplyNowPonctually();
-		if (_applyPermanently)
+		_dimensionNode = _subViewportRoot.GetParent() as Dimension;
+		if (_dimensionNode == null)
 		{
-			_timerPermanentApplyingFrequency.OneShot = false;
-			_timerPermanentApplyingFrequency.Paused = false;
-			_timerPermanentApplyingFrequency.WaitTime = _permanentApplyingFrequency;
-			_timerPermanentApplyingFrequency.Start();
-			// Méthode 1 : Utilisation de la syntaxe moderne
-			_timerPermanentApplyingFrequency.Timeout += ApplyNowPonctually;
+			GD.PushError("Impossible de récupérer la Dimension parente.");
+			return;
+		}
+		//
+		if (_helperNode == null)
+		{
+			_helperNode = new RuleCommonNodeMethodsHelper();
+			_helperNode.OnReady = () =>
+			{
+				if(_applyOnStart)ApplyPonctually();
+			};
+			_helperNode.OnProcessFrame = (float delta) =>
+			{
+				if(_applyPermanently)ApplyPonctually();
+			};
+			_helperNode.OnExit = () =>
+			{
+				if(_applyOnEnd)ApplyPonctually();
+			};
+			_helperNode.ProcessMode = Node.ProcessModeEnum.Always;
+			_helperNode.SetProcess(true);
+			_subViewportRoot.GetParent<Dimension>().CallDeferred("add_child",_helperNode);
+			//define common methods of Node to the helperNode because overrided in children classes ( must not be implemented)
+			DefineCommonNodeMethods();
 		}
 	}
 	
-	public abstract void ApplyNowPonctually();
+	public abstract void ApplyPonctually();
+	public virtual void DefineCommonNodeMethods()
+	{}
 
+	public virtual void ValidationMessageConsole()
+	{
+		GD.Print($"Règle {GetClass()} bien appliquée à la dimension {_dimensionNode.Name}.");
+	}
 
 	
-	public void ExitTree()
-	{
-		if(_applyOnEnd)ApplyNowPonctually();
-	}
+	
 
 	public void Pause()
 	{

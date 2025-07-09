@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_e8tfm")
 ChosenColor = Color(0, 0, 0, 1)
+metadata/_custom_type_script = "uid://c2wp4rxrwv1nr"
