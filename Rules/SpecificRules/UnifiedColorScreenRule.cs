@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 namespace Dim.Rules.SpecificRules;
@@ -7,12 +8,13 @@ public partial class UnifiedColorScreenRule : DimensionRule
 {
 	private ColorRect _existingColorRect;
 	[Export] public Color ChosenColor { get; set; } = new Color (1,1,1);// blanc par défaut
+	[Export] public bool RandomColor = false;
 
 
 	protected override void ApplyPonctually()
 	{
 		// Supprimer l'ancien ColorRect s'il existe
-		_existingColorRect = SubViewportRoot.GetNodeOrNull<ColorRect>("BackgroundColor");
+		_existingColorRect = SubViewportRootRef.GetNodeOrNull<ColorRect>("BackgroundColor");
 		if (_existingColorRect != null)
 		{
 			_existingColorRect.QueueFree();
@@ -22,7 +24,7 @@ public partial class UnifiedColorScreenRule : DimensionRule
 		var colorRect = new ColorRect
 		{
 			Name = "BackgroundColor",
-			Color = ChosenColor,
+			Color = RandomColor?new Color((float)GD.RandRange(0.0,1.0),(float)GD.RandRange(0.0,1.0),(float)GD.RandRange(0.0,1.0),1f):ChosenColor,
 			ZIndex = -1, // S'assure qu'il est derrière tout
 			LayoutMode = 1, // Mode layout proportionnel
 			AnchorsPreset = (int)Control.LayoutPreset.FullRect, // Remplit tout l'espace
@@ -30,8 +32,8 @@ public partial class UnifiedColorScreenRule : DimensionRule
 		};
 
 		// Ajouter le ColorRect comme premier enfant du SubViewport
-		SubViewportRoot.AddChild(colorRect);
-		SubViewportRoot.MoveChild(colorRect, 0); // Le place en premier dans la hiérarchie
+		SubViewportRootRef.AddChild(colorRect);
+		SubViewportRootRef.MoveChild(colorRect, 0); // Le place en premier dans la hiérarchie
 
 	}
 
@@ -41,7 +43,7 @@ public partial class UnifiedColorScreenRule : DimensionRule
 			_existingColorRect.QueueFree();
 	}
 
-	protected override void DefineCommonHelperNodeMethods()
+	protected override void AddCommonHelperNodeMethods()
 	{
 		
 	}

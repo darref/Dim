@@ -3,7 +3,7 @@
 namespace Dim.Rules.SpecificRules;
 
 [GlobalClass]
-public partial class ColoredDotRule : DimensionRule
+public partial class AddColoredDotOnClickRule : DimensionRule
 {
     private ColorRect _dot;
     private bool _done;
@@ -12,7 +12,7 @@ public partial class ColoredDotRule : DimensionRule
     [Export] public MouseButton MouseButtonForApplyingDot { get; set; } = MouseButton.Left;
     [Export] public MouseButton MouseButtonForDeletingDot { get; set; } = MouseButton.Right;
 
-    protected override void DefineCommonHelperNodeMethods()
+    protected override void AddCommonHelperNodeMethods()
     {
         HelperNode.OnReady += () =>
         {
@@ -20,12 +20,12 @@ public partial class ColoredDotRule : DimensionRule
             ApplyOnEnd = false;
             ApplyOnStart = false;
             //
-            if (SubViewportRoot == null) return;
+            if (SubViewportRootRef == null) return;
             // Centre initial de la souris
-            var center = SubViewportRoot.Size / 2;
+            var center = SubViewportRootRef.Size / 2;
             Input.WarpMouse(center);
             // Activer les InputEvents
-            DimensionNode.SetProcessInput(true);
+            DimensionNodeRef.SetProcessInput(true);
         };
         HelperNode.OnInput += e =>
         {
@@ -52,7 +52,7 @@ public partial class ColoredDotRule : DimensionRule
             Position = DisplayServer.MouseGetPosition()
         };
         _dot = dot;
-        SubViewportRoot.AddChild(dot);
+        SubViewportRootRef.AddChild(dot);
         _done = true;
     }
 

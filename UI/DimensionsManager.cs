@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dim.Datas;
@@ -22,43 +21,35 @@ public partial class DimensionsManager : Control
 {
 	// base scene
 	private const string DimensionScenePath = "res://Dimensions/dimension.tscn";
-
-	// dim
 	private readonly List<Dimension> _dimensions = new();
-	public EnumDimensionSwitchingMode DimensionChangeMode = EnumDimensionSwitchingMode.Fade;
+	private AudioStreamPlayer2D _audioPlayer = new();
+	private AudioStreamPlayer2D _audioPlayerAmbiance = new();
+	private readonly float _changingViewTweenDuration = 0.5f;
 	private PackedScene _dimensionScene;
 	private bool _enabledNavigation = true;
 
-	// slider
-	private Control _viewContainer;
-	private AudioStreamPlayer2D _audioPlayer = new();
-	private AudioStreamPlayer2D _audioPlayerAmbiance = new();
-	public int CurrentIndex;
-
 	private bool _isChangingView;
 
+	// slider
+	private Control _viewContainer;
+	private  int CurrentIndex = 0;
+	public EnumDimensionSwitchingMode DimensionChangeMode = EnumDimensionSwitchingMode.Fade;
+	private Tween _tween;
+
+	// dim
+	[Export] public int NumberOfDimensionToCreateInitially { get; set; } = 10;
+	[Export] public bool CreateNegativeAndPositiveInitially { get; set; } = true;
+
 	// laws
-	[Export] public Array<LawEntriesByOrder> LawOrders { get; set; } = new();
-	[Export] public Array<LawEntry>   TransdimensionalLaws { get; set; } = new ();
+	[Export] public Array<OrderLaws> OrderLaws { get; set; } = new();
+	[Export] public Array<TransdimensionalLaws> TransdimensionalLaws { get; set; } = new();
 	[Export] public Array<AudioStreamEntry> EntriesMusic { get; set; } = new();
 	[Export] public Array<AudioStreamEntry> EntriesAmbiance { get; set; } = new();
 
-	public void UpdateLayoutGeneral()
-	{
-		_dimensions.Sort((a, b) => a._dimOrder.CompareTo(b._dimOrder));
-		switch (DimensionChangeMode)
-		{
-			case EnumDimensionSwitchingMode.Slide:
-				UpdateLayoutSliderMode();
-				break;
-			case EnumDimensionSwitchingMode.Fade:
-				UpdateLayoutFade();
-				break;
-		}
-	}
 
 	public override void _Ready()
 	{
+		//frontend
 		WindowManager.Instance.ResizeFinished += UpdateLayoutGeneral;
 
 		_viewContainer = new Control
@@ -67,29 +58,12 @@ public partial class DimensionsManager : Control
 			MouseFilter = MouseFilterEnum.Ignore,
 			LayoutMode = 1,
 			AnchorsPreset = (int)LayoutPreset.FullRect,
+
 			Position = Vector2.Zero
 		};
 		AddChild(_viewContainer);
 
 		_dimensionScene = GD.Load<PackedScene>(DimensionScenePath);
-		//créer les dimensions
-		if (LawOrders == null)
-		{
-			GD.PrintErr("lawOrders est null !");
-			return;
-		}
-		foreach (var laworder in LawOrders)
-		{
-			if (laworder == null)
-			{
-				GD.PrintErr("Une entrée null détectée dans lawOrders !");
-				continue;
-			}
-
-			AddNewDimension(laworder.Order);
-		}
-		//
-		ApplyTransdimensionalLaws();
 		//musiques et ambiances
 		if (EntriesAmbiance.Count != 0 && EntriesMusic.Count != 0)
 		{
@@ -102,75 +76,83 @@ public partial class DimensionsManager : Control
 			_audioPlayer.Play();
 		}
 
-		InitChangingView();
-		UpdateLayoutGeneral();
-		ChangeView(CurrentIndex);
-	}
+		//dimensions and laws
+		CreateDimensionsAndApplyAllLaws();
+		//apply initial fronted !!! important to initialize with thes calls !!!
+		CurrentIndex = 0;
+		for(int index = 0; index < 4; index++)
+			SetChangingDimensionMode(DimensionChangeMode == EnumDimensionSwitchingMode.Slide
+				? EnumDimensionSwitchingMode.Fade
+				: EnumDimensionSwitchingMode.Slide);
 
-	private void ApplyTransdimensionalLaws()
-	{
-		foreach (var tLaw in TransdimensionalLaws)
-			foreach (var dimension in _dimensions)
-				dimension.AddLRuleIfNotAlreadyContained(tLaw.Duplicate() as DimensionRule);
-		
-	}
-
-	private void InitChangingView()
-	{
-		CurrentIndex = _dimensions[0]._dimOrder;
 		foreach (var dimension in _dimensions)
-		{
-			
-			switch (DimensionChangeMode)
-			{
-				case EnumDimensionSwitchingMode.Slide:
-					dimension.ZIndex = 100;
-					dimension.Modulate = new Color(1, 1, 1, 1);
-					break;
-				case EnumDimensionSwitchingMode.Fade:
-					dimension.ZIndex = dimension._dimOrder == CurrentIndex ? 100 : 0;
-					dimension.Modulate = dimension._dimOrder == CurrentIndex?  new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0);
-					break;
-			}
-		}
-		
+			GD.Print(dimension.Name + " --- order: " + dimension._dimOrder + " --- index: " + _dimensions.IndexOf(dimension));
 	}
-	
+
+
+
+
+	//Frontend//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	private void UpdateLayoutGeneral()
+	{
+		if (_isChangingView) return;
+
+
+		switch (DimensionChangeMode)
+		{
+			case EnumDimensionSwitchingMode.Slide:
+				UpdateLayoutSliderMode();
+				break;
+			case EnumDimensionSwitchingMode.Fade:
+				UpdateLayoutFade();
+				break;
+		}
+	}
 
 	public void SetChangingDimensionMode(EnumDimensionSwitchingMode mode)
 	{
+		//changement de mode et repercussions sur la vue
 		DimensionChangeMode = mode;
+		UpdateLayoutGeneral();
+		GD.Print(CurrentIndex);
 	}
 
 	private void UpdateLayoutSliderMode()
 	{
 		Vector2 windowSize = DisplayServer.ScreenGetSize();
-
-		Position = Vector2.Zero;
+		
 		CustomMinimumSize = windowSize;
+		Position = Vector2.Zero;
 
-		_viewContainer.Position = new Vector2(-CurrentIndex * windowSize.X, 0);
-		_viewContainer.CustomMinimumSize = new Vector2(windowSize.X * _dimensions.Count, windowSize.Y);
+		// Utilise une copie triée de _dimensions
+		var sortedDimensions = _dimensions.OrderBy(d => d._dimOrder).ToList();
+		var currentDimension = sortedDimensions.FirstOrDefault(d => d._dimOrder == CurrentIndex);
+		int currentIndexInSorted = sortedDimensions.IndexOf(currentDimension);
+		_viewContainer.Position = new Vector2(-currentIndexInSorted * windowSize.X, 0);
+		_viewContainer.CustomMinimumSize = new Vector2(windowSize.X * sortedDimensions.Count, windowSize.Y);
 
-		foreach (var dimension in _dimensions)
+		for (int i = 0; i < sortedDimensions.Count; i++)
 		{
-			// Taille de la dimension = taille de l'écran/fenêtre
+			var dimension = sortedDimensions[i];
 			dimension.LayoutMode = 0;
 			dimension.CustomMinimumSize = windowSize;
-			// Position horizontale en fonction de son ordre
-			dimension.Position = new Vector2(windowSize.X * dimension._dimOrder, 0);
+			dimension.Position = new Vector2(i * windowSize.X, 0f);
+			dimension.ZIndex = 100;
+			dimension.Modulate = new Color(1, 1, 1,1);
+
 		}
 	}
 
 
-	public void SlideToView(int targetIndex)
+	private void SlideToView(Dimension targetedDimension, float changingViewTweenDuration)
 	{
-		if (!_enabledNavigation || _isChangingView )
+		if (!_enabledNavigation || _isChangingView)
 			return;
 
-		GD.Print($"Sliding Dimension from {CurrentIndex} to {targetIndex}");
+		GD.Print($"Sliding Dimension from {CurrentIndex} to {targetedDimension._dimOrder}");
 		_isChangingView = true;
-		UpdateLayoutSliderMode();
 
 		var tween = CreateTween();
 		tween.SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Cubic);
@@ -178,12 +160,19 @@ public partial class DimensionsManager : Control
 		var windowSize = DisplayServer.ScreenGetSize();
 
 		var fromPos = _viewContainer.Position;
-		var toPos = new Vector2(-targetIndex * windowSize.X, fromPos.Y);
-		tween.TweenProperty(_viewContainer, "position", toPos, 0.5);
+		// Étape 1 : liste triée
+		var sortedDimensions = _dimensions.OrderBy(d => d._dimOrder).ToList();
+		var targetIndexInSorted = sortedDimensions.IndexOf(targetedDimension);
+
+		// Étape 3 : calcul du décalage
+		var toPos = new Vector2(-(targetIndexInSorted) * windowSize.X, fromPos.Y);
+		tween.TweenProperty(_viewContainer, "position", toPos, changingViewTweenDuration);
+
 
 		tween.TweenCallback(Callable.From(() =>
 		{
-			CurrentIndex = targetIndex;
+			CurrentIndex = targetedDimension._dimOrder;
+
 			_isChangingView = false;
 			if (EntriesMusic.Count > 0)
 			{
@@ -199,48 +188,70 @@ public partial class DimensionsManager : Control
 	{
 		Vector2 windowSize = DisplayServer.ScreenGetSize();
 
+		Position = Vector2.Zero;
+		CustomMinimumSize = windowSize;
+
+		_viewContainer.Position = Vector2.Zero;
+		_viewContainer.CustomMinimumSize = windowSize;
+
 		foreach (var dimension in _dimensions)
 		{
+			dimension._subViewportRoot.SetTransparentBackground(true);
 			dimension.LayoutMode = 0;
 			dimension.Position = Vector2.Zero;
 			dimension.CustomMinimumSize = windowSize;
 			dimension.Size = windowSize;
 			dimension._subViewportRoot.TransparentBg = true;
+			dimension.ZIndex = dimension._dimOrder == CurrentIndex ? 100 : 0;
+			dimension.Modulate = dimension._dimOrder == CurrentIndex ? new Color(1, 1, 1,1) : new Color(1, 1, 1, 0);
 		}
-		_viewContainer.Position = Vector2.Zero;
+		
+		var currentDimension = _dimensions.Where(d => d._dimOrder == CurrentIndex).FirstOrDefault();
+		foreach (var dim in _dimensions)
+		{
+			dim.ZIndex = dim == currentDimension  ? 100 : 0;
+			dim.SetModulate( dim == currentDimension  ? new Color(1,1,1,1) : new Color(1,1,1,0));
+		}
+			
+
+		
 	}
 
-	public void FadeToView(int targetIndex)
+	private void FadeToView(Dimension dimensionTargeted, float changingViewTweenDuration)
 	{
-		if (!_enabledNavigation || _isChangingView   )
+		if (!_enabledNavigation || _isChangingView || dimensionTargeted == null)
 			return;
 
-		_isChangingView = true;
-		GD.Print($"Fading Dimension from {CurrentIndex} to {targetIndex}");
-
-		UpdateLayoutFade();
-
-		// Forcer le zindex initial
-		for (var index = 0; index < _dimensions.Count; index++)
-			_dimensions[index].ZIndex = index == CurrentIndex || index == targetIndex ? 100 : 0;
-		var tween = CreateTween();
-		// Crossfade propre
-		tween.TweenProperty(_dimensions[targetIndex], "modulate:a", 1.0f, 0.5);
-		tween.TweenProperty(_dimensions[CurrentIndex], "modulate:a", 0.0f, 0.5);
-
-		tween.TweenCallback(Callable.From(() =>
+		if (!_dimensions.Contains(dimensionTargeted))
 		{
-			CurrentIndex = targetIndex;
+			GD.PushError("La dimension cible n'est pas dans la liste des dimensions.");
+			return;
+		}
+
+		_isChangingView = true;
+
+		var currentDimension = _dimensions.Where(d => d._dimOrder == CurrentIndex).FirstOrDefault();
+		GD.Print($"Fading Dimension from '{currentDimension.Name}' to '{dimensionTargeted.Name}'");
+
+		// Applique le ZIndex uniquement aux deux dimensions concernées
+		foreach (var dim in _dimensions)
+			dim.ZIndex = dim == currentDimension || dim == dimensionTargeted ? 100 : 0;
+
+		_tween = CreateTween();
+
+		_tween.TweenProperty(dimensionTargeted, "modulate:a", 1.0f, changingViewTweenDuration);
+		_tween.TweenProperty(currentDimension, "modulate:a", 0.0f, changingViewTweenDuration);
+
+		_tween.TweenCallback(Callable.From(() =>
+		{
+			// Cacher toutes les dimensions sauf la cible
+			foreach (var dim in _dimensions)
+				if (dim != dimensionTargeted)
+					dim.Modulate = new Color(1, 1, 1, 0);
+
+			// Mise à jour manuelle de CurrentIndex pour qu’il corresponde à la nouvelle
+			CurrentIndex = dimensionTargeted._dimOrder;
 			_isChangingView = false;
-
-
-			if (EntriesMusic.Count > 0)
-			{
-				_audioPlayer.Stream = EntriesMusic[CurrentIndex]?.Stream;
-				_audioPlayerAmbiance.Stream = EntriesAmbiance[CurrentIndex]?.Stream;
-				_audioPlayer.Play();
-				_audioPlayerAmbiance.Play();
-			}
 		}));
 	}
 
@@ -249,32 +260,45 @@ public partial class DimensionsManager : Control
 	{
 		if (@event is InputEventJoypadMotion btn && btn.GetAxisValue() > 0.8f)
 		{
-			if (btn.GetAxis() == JoyAxis.TriggerLeft && CurrentIndex > 0)
+			if (btn.GetAxis() == JoyAxis.TriggerLeft)
 				ChangeView(CurrentIndex - 1);
-			else if (btn.GetAxis() == JoyAxis.TriggerRight && CurrentIndex < _dimensions.Count - 1)
+			else if (btn.GetAxis() == JoyAxis.TriggerRight)
 				ChangeView(CurrentIndex + 1);
 		}
 		else if (@event is InputEventKey btnPc && btnPc.Pressed)
 		{
-			if (btnPc.Keycode == Key.Left && CurrentIndex > 0)
+			if (btnPc.Keycode == Key.Left)
 				ChangeView(CurrentIndex - 1);
-			else if (btnPc.Keycode == Key.Right && CurrentIndex < _dimensions.Count - 1)
+			else if (btnPc.Keycode == Key.Right)
 				ChangeView(CurrentIndex + 1);
+			else if (btnPc.Keycode == Key.F1)
+				SetChangingDimensionMode(DimensionChangeMode == EnumDimensionSwitchingMode.Slide
+					? EnumDimensionSwitchingMode.Fade
+					: EnumDimensionSwitchingMode.Slide);
 		}
 	}
 
-	private void ChangeView(int targetIndex)
+	//To commonly change the dimension call THIS method
+	public void ChangeView(int targetIndex)
 	{
-		if (!_enabledNavigation || targetIndex == CurrentIndex) return;
+		if (!_enabledNavigation || _isChangingView) return;
+		if (!_dimensions.Where(d => d._dimOrder == targetIndex).Any()) return;
+		if (CurrentIndex == targetIndex) return;
+		UpdateLayoutGeneral();
 		switch (DimensionChangeMode)
 		{
 			case EnumDimensionSwitchingMode.Slide:
-				SlideToView(targetIndex);
+				SlideToView(findDimensionByOrder(targetIndex), _changingViewTweenDuration);
 				break;
 			case EnumDimensionSwitchingMode.Fade:
-				FadeToView(targetIndex);
+				FadeToView(findDimensionByOrder(targetIndex), _changingViewTweenDuration);
 				break;
 		}
+	}
+
+	public Dimension findDimensionByOrder(int order)
+	{
+		return _dimensions.Where(d => d._dimOrder == order).FirstOrDefault();
 	}
 
 	public void EnableNavigation(bool b)
@@ -282,56 +306,67 @@ public partial class DimensionsManager : Control
 		_enabledNavigation = b;
 	}
 
-	public void AddNewDimension(int dim)
+	//backend//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private void CreateDimensionsAndApplyAllLaws()
 	{
+		if (OrderLaws == null) return;
+		if (TransdimensionalLaws == null) return;
+		var messagealreadyexists = "Dimension already exists , cannot add it";
+		for (var i = 0; i <= NumberOfDimensionToCreateInitially; i++)
+			if (CreateNegativeAndPositiveInitially)
+			{
+				if (!AddNewDimensionIfNotAlreadyExists(-i))
+					GD.Print(messagealreadyexists);
+				if (!AddNewDimensionIfNotAlreadyExists(i))
+					GD.Print(messagealreadyexists);
+			}
+			else
+			{
+				if (!AddNewDimensionIfNotAlreadyExists(i))
+					GD.Print(messagealreadyexists);
+			}
+
+		_dimensions.Sort((a, b) => a._dimOrder.CompareTo(b._dimOrder));
+
+		foreach (var law in TransdimensionalLaws)
+		foreach (var dimension in _dimensions)
+		foreach (var rule in law.Rules)
+		{
+			var ruleInited = rule.Duplicate() as DimensionRule;
+			ruleInited.Init(dimension._subViewportRoot, rule.ApplyOnStart, rule.ApplyOnEnd,
+				rule.ApplyPermanently);
+			dimension.AddLRuleIfNotAlreadyContained(ruleInited);
+		}
+
+
+		foreach (var law in OrderLaws)
+		foreach (var dimension in _dimensions)
+		foreach (var rule in law.Rules)
+			if (law.DimensionOrder == dimension._dimOrder)
+			{
+				var ruleInited = rule.Duplicate() as DimensionRule;
+				ruleInited.Init(dimension._subViewportRoot, rule.ApplyOnStart, rule.ApplyOnEnd,
+					rule.ApplyPermanently);
+				dimension.AddLRuleIfNotAlreadyContained(ruleInited);
+			}
+	}
+
+
+	public bool AddNewDimensionIfNotAlreadyExists(int ord)
+	{
+		if (_dimensions.Where(d => d._dimOrder == ord).Any()) return false;
+
 		var newDimension = _dimensionScene.Instantiate() as Dimension;
 		if (newDimension == null)
 		{
 			GD.Print("Erreur de casting de la dimension dans AddNewDimension");
-			return;
+			return false;
 		}
 
-		newDimension.Init(dim);
-		AddLawsToDimension(newDimension);
+		newDimension.Init(ord);
 		_viewContainer.AddChild(newDimension);
 		_dimensions.Add(newDimension);
-	}
-
-	private void AddLawsToDimension(Dimension dimension)
-	{
-		if (LawOrders == null) return;
-
-		foreach (var laworder in LawOrders)
-		{
-			if (laworder?.LawEntries == null) continue;
-
-			foreach (var lawEntry in laworder.LawEntries)
-			{
-				if (lawEntry == null || lawEntry.Rule == null || dimension._dimOrder != laworder.Order ||
-					!lawEntry.Enabled)
-					continue;
-
-				try
-				{
-					var lawInstance = lawEntry.Rule.Duplicate() as DimensionRule;
-					
-
-					lawInstance.Init(
-						dimension._subViewportRoot,
-						dimension._dimOrder,
-						lawEntry._applyOnStart,
-						lawEntry._applyOnEnd,
-						lawEntry._applyPermanently
-					);
-
-					dimension.AddLRuleIfNotAlreadyContained(lawInstance);
-				}
-				catch (Exception e)
-				{
-					GD.PrintErr($"Erreur lors de l’instanciation de la règle : {e.Message}");
-				}
-
-			}
-		}
+		_dimensions.Sort((a, b) => a._dimOrder.CompareTo(b._dimOrder));
+		return true;
 	}
 }

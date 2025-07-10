@@ -1,34 +1,48 @@
 using Dim.Dimensions;
+using Dim.Rules.Creators;
+using Dim.Rules.SpecificRules;
+using Dim.UI;
 using Godot;
 
 namespace Dim.Rules;
 
+[GlobalClass]
 public abstract partial class DimensionRule : Resource
 {
+    [Export] public bool ApplyOnStart { get; set; }
+    [Export] public bool ApplyOnEnd { get; set; }
+    [Export] public bool ApplyPermanently { get; set; }
+    [Export] public float PermanentApplyingFrequency = 0.05f;
     private float _elapsedSinceLastApply = 0f;
-    private float _permanentApplyingFrequency = 0.05f;
-    protected Dimension DimensionNode;
-    protected int DimOrder;
+    [Export] public DimensionsCreator DimensionsCreator;
+    [Export] public RulesCreator RulesCreator;
+    [Export] public bool Enabled = true;
+    [Export] public bool ConsoleMessagesEnabled = false;
+    //
+    protected Dimension DimensionNodeRef;
+    protected SubViewport SubViewportRootRef;
+    protected DimensionsManager DimensionManagerRef;
     protected RuleCommonNodeMethodsHelper HelperNode;
-    protected SubViewport SubViewportRoot;
-    public bool ApplyOnStart { get; set; }
-    public bool ApplyOnEnd { get; set; }
-    public bool ApplyPermanently { get; set; }
-
+    
     //internalmethods
-    public void Init(SubViewport subViewportRoot, int dimOrder, bool applyOnStart = false, bool applyOnEnd = false,
-        bool applyPermanently = false , float permanentApplyingFrequency = 0.05f)
+    public void Init(SubViewport subViewportRoot, bool applyOnStart = false, bool applyOnEnd = false,
+        bool applyPermanently = false, float permanentApplyingFrequency = 0.05f)
     {
-        SubViewportRoot = subViewportRoot;
-        DimOrder = dimOrder;
+        SubViewportRootRef = subViewportRoot;
         ApplyOnStart = applyOnStart;
         ApplyOnEnd = applyOnEnd;
         ApplyPermanently = applyPermanently;
-        _permanentApplyingFrequency = permanentApplyingFrequency;
-        DimensionNode = SubViewportRoot.GetParent() as Dimension;
-        if (DimensionNode == null)
+        PermanentApplyingFrequency = permanentApplyingFrequency;
+        DimensionNodeRef = SubViewportRootRef.GetParent() as Dimension;
+        if (DimensionNodeRef == null)
         {
             GD.PushError(GetType() + " Impossible de récupérer la Dimension parente.");
+            return;
+        }
+        DimensionManagerRef = DimensionNodeRef.GetParent().GetParent() as DimensionsManager;
+        if (DimensionManagerRef == null)
+        {
+            GD.PushError(GetType() + " Impossible de récupérer le DimensionManager parent.");
             return;
         }
         //
@@ -37,7 +51,7 @@ public abstract partial class DimensionRule : Resource
             HelperNode = new RuleCommonNodeMethodsHelper();
             HelperNode.OnReady += () =>
             {
-                if (SubViewportRoot == null || DimensionNode == null)
+                if (SubViewportRootRef == null || DimensionNodeRef == null)
                 {
                     RuleErrorMessage($"[HelperNodeReady] of {GetName()} : SubViewportRoot or DimensionNode is null");
                     return;
@@ -53,7 +67,7 @@ public abstract partial class DimensionRule : Resource
                 if (!ApplyPermanently)
                     return;
 
-                if (SubViewportRoot == null || DimensionNode == null)
+                if (SubViewportRootRef == null || DimensionNodeRef == null)
                 {
                     RuleErrorMessage($"[HelperNodeProcess] of {GetName()} : SubViewportRoot or DimensionNode is null");
                     return;
@@ -61,7 +75,7 @@ public abstract partial class DimensionRule : Resource
 
                 _elapsedSinceLastApply += delta;
 
-                if (_elapsedSinceLastApply >= _permanentApplyingFrequency)
+                if (_elapsedSinceLastApply >= PermanentApplyingFrequency)
                 {
                     _elapsedSinceLastApply = 0f;
                     ApplyPonctually();
@@ -70,7 +84,7 @@ public abstract partial class DimensionRule : Resource
             };
             HelperNode.OnInput += e =>
             {
-                if (SubViewportRoot == null || DimensionNode == null)
+                if (SubViewportRootRef == null || DimensionNodeRef == null)
                     RuleErrorMessage($"[HelperNodeInput] of {GetName()} : SubViewportRoot or DimensionNode is null");
                 //
 
@@ -79,7 +93,7 @@ public abstract partial class DimensionRule : Resource
             };
             HelperNode.OnExit += () =>
             {
-                if (SubViewportRoot == null || DimensionNode == null)
+                if (SubViewportRootRef == null || DimensionNodeRef == null)
                     RuleErrorMessage($"[HelperNodeExit] of {GetName()} : SubViewportRoot or DimensionNode is null");
                 //
                 if (ApplyPermanently) ApplyPonctually();
@@ -88,10 +102,10 @@ public abstract partial class DimensionRule : Resource
             };
             HelperNode.SetProcessMode(Node.ProcessModeEnum.Pausable);
             HelperNode.SetProcess(true);
-            SubViewportRoot.GetParent<Dimension>().CallDeferred("add_child", HelperNode);
+            SubViewportRootRef.GetParent<Dimension>().CallDeferred("add_child", HelperNode);
             HelperNode.Name = "HelperFor" + GetType().Name;
             //define common methods of Node to the helperNode because overrided in children classes ( must not be implemented)
-            DefineCommonHelperNodeMethods();
+            AddCommonHelperNodeMethods();
         }
     }
 
@@ -99,17 +113,19 @@ public abstract partial class DimensionRule : Resource
 
     protected abstract void UnApplyPonctually();
 
-    protected abstract void DefineCommonHelperNodeMethods();
+    protected abstract void AddCommonHelperNodeMethods();
 
 
     protected virtual void RuleErrorMessage(string s)
     {
-        GD.PrintErr(s);
+        if(ConsoleMessagesEnabled)
+            GD.PrintErr(s);
     }
 
     protected virtual void RuleValidationMessage(string s)
     {
-        GD.Print(s);
+        if(ConsoleMessagesEnabled)
+            GD.Print(s);
     }
 
     //externalmethods
@@ -127,7 +143,7 @@ public abstract partial class DimensionRule : Resource
     public void SetProcessFrequency(float frequency)
     {
         if (ApplyPermanently)
-            _permanentApplyingFrequency = frequency;
+            PermanentApplyingFrequency = frequency;
         else
             GD.Print($"this rule is not permanent , cannot set its frequency");
     }

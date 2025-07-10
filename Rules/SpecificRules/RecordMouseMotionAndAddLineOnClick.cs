@@ -5,7 +5,7 @@ using Godot;
 namespace Dim.Rules.SpecificRules;
 
 [GlobalClass]
-public partial class RecordMouseMotion : DimensionRule
+public partial class RecordMouseMotionAndAddLineOnClick : DimensionRule
 {
     private Line2D _line;
     private readonly List<Vector2> _recordedPoints = new();
@@ -15,7 +15,7 @@ public partial class RecordMouseMotion : DimensionRule
     [Export] public MouseButton MouseButtonForResetRecording { get; set; } = MouseButton.Right;
 
 
-    protected override void DefineCommonHelperNodeMethods()
+    protected override void AddCommonHelperNodeMethods()
     {
         HelperNode.OnInput += e =>
         {
@@ -45,14 +45,14 @@ public partial class RecordMouseMotion : DimensionRule
                 Antialiased = true,
                 Visible = false
             };
-            DimensionNode.AddChild(_line);
+            DimensionNodeRef.AddChild(_line);
             // Centre initial de la souris
-            var center = SubViewportRoot.Size / 2;
+            var center = SubViewportRootRef.Size / 2;
             Input.WarpMouse(center);
             // Connecte le signal de mouvement de souris (sur `_dimensionNode`)
-            DimensionNode.Connect("mouse_entered", Callable.From(() => { DimensionNode.SetProcessInput(true); }));
-            DimensionNode.SetProcess(true);
-            DimensionNode.SetProcessInput(true);
+            DimensionNodeRef.Connect("mouse_entered", Callable.From(() => { DimensionNodeRef.SetProcessInput(true); }));
+            DimensionNodeRef.SetProcess(true);
+            DimensionNodeRef.SetProcessInput(true);
         };
         
     }

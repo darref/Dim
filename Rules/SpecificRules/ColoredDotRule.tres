@@ -1,8 +1,17 @@
-[gd_resource type="Resource" script_class="ColoredDotRule" load_steps=2 format=3 uid="uid://cdjek03850r3l"]
+[gd_resource type="Resource" script_class="AddColoredDotOnClickRule" load_steps=2 format=3 uid="uid://cdjek03850r3l"]
 
-[ext_resource type="Script" uid="uid://dtl5b1n57o1kw" path="res://Rules/SpecificRules/ColoredDotRule.cs" id="1_o1u64"]
+[ext_resource type="Script" uid="uid://dtl5b1n57o1kw" path="res://Rules/SpecificRules/AddColoredDotOnClickRule.cs" id="1_o1u64"]
 
 [resource]
 script = ExtResource("1_o1u64")
 DotColor = Color(1, 0, 0, 1)
+OneShot = false
+MouseButtonForApplyingDot = 1
+MouseButtonForDeletingDot = 2
+ApplyOnStart = false
+ApplyOnEnd = false
+ApplyPermanently = false
+PermanentApplyingFrequency = 0.05
+Enabled = true
+ConsoleMessagesEnabled = false
 metadata/_custom_type_script = "uid://dtl5b1n57o1kw"
