@@ -34,9 +34,6 @@ public partial class RecordMouseMotionAndAddLineOnClick : DimensionRule
         };
         HelperNode.OnReady += () =>
         {
-            ApplyPermanently = false;
-            ApplyOnEnd = false;
-            ApplyOnStart = true;
             // Initialise la ligne
             _line = new Line2D
             {
@@ -49,13 +46,11 @@ public partial class RecordMouseMotionAndAddLineOnClick : DimensionRule
             // Centre initial de la souris
             var center = SubViewportRootRef.Size / 2;
             Input.WarpMouse(center);
-            // Connecte le signal de mouvement de souris (sur `_dimensionNode`)
-            DimensionNodeRef.Connect("mouse_entered", Callable.From(() => { DimensionNodeRef.SetProcessInput(true); }));
-            DimensionNodeRef.SetProcess(true);
-            DimensionNodeRef.SetProcessInput(true);
+           
         };
         
     }
+
 
 
     protected override void ApplyPonctually()
@@ -69,9 +64,7 @@ public partial class RecordMouseMotionAndAddLineOnClick : DimensionRule
         _line.ClearPoints();
         _line.Visible = true;
         foreach (var point in _recordedPoints) _line.AddPoint(point);
-
-        // Optionnel : lisser la ligne ?
-        // TODO : ajouter algorithme de lissage si besoin
+        
     }
 
     protected override void UnApplyPonctually()

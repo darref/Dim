@@ -4,54 +4,55 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5efaf34f-2732-43c1-a76d-8daa85b20e7b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Dimensions/SpecificRules/AddACubeDimensionRule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Again/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Again/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="99ce791f-9eef-4d04-8ae6-510b21e9156f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Again/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Again/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dim/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dim/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dim/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Again.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Again.sln" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Dimensions/Dimension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dimensions/Dimension.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Rules/DimensionRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Rules/DimensionRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Rules/RuleCommonNodeMethodsHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Rules/RuleCommonNodeMethodsHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Rules/SpecificRules/AddColoredDotOnClickRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Rules/SpecificRules/AddColoredDotOnClickRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Rules/SpecificRules/RecordMouseMotionAndAddLineOnClick.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Rules/SpecificRules/RecordMouseMotionAndAddLineOnClick.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Scenes/main.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/Scenes/main.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/DimensionsManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UI/DimensionsManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="DpaMonitoringSettings">
-    <option name="firstShow" value="false" />
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet.." root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$USER_HOME$/AppData/Local/Temp/SourceGeneratedDocuments/722473646D3662CA8F501163/Godot.SourceGenerators/Godot.SourceGenerators.ScriptMethodsGenerator/Again.Dimensions.Dimension_ScriptMethods.generated.cs" root0="FORCE_HIGHLIGHTING" />
-  </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 1
-}</component>
-  <component name="ProjectId" id="2zS1FRu9KwOtQLUVzmOUkJNzr9w" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="2zh7WEe4FgNNLSZL5fjRrhNqLDG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Executable.Player.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Executable.Player">
     <configuration name="Player GDScript" type="GDSCRIPT_DEBUG_RUN_CONFIGURATION" factoryName="GdScriptRunFactory" show_console_on_std_err="false" show_console_on_std_out="false" port="6006">
       <option name="address" value="127.0.0.1" />
@@ -102,14 +103,12 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="5efaf34f-2732-43c1-a76d-8daa85b20e7b" name="Changes" comment="" />
-      <created>1751709557018</created>
+      <changelist id="99ce791f-9eef-4d04-8ae6-510b21e9156f" name="Changes" comment="" />
+      <created>1752171481776</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1751709557018</updated>
-      <workItem from="1751709559700" duration="1618000" />
-      <workItem from="1751713986960" duration="33445000" />
-      <workItem from="1751819219660" duration="19785000" />
+      <updated>1752171481776</updated>
+      <workItem from="1752171486510" duration="12346000" />
     </task>
     <servers />
   </component>

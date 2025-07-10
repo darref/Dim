@@ -16,16 +16,10 @@ public partial class AddColoredDotOnClickRule : DimensionRule
     {
         HelperNode.OnReady += () =>
         {
-            ApplyPermanently = false;
-            ApplyOnEnd = false;
-            ApplyOnStart = false;
-            //
-            if (SubViewportRootRef == null) return;
             // Centre initial de la souris
             var center = SubViewportRootRef.Size / 2;
             Input.WarpMouse(center);
-            // Activer les InputEvents
-            DimensionNodeRef.SetProcessInput(true);
+
         };
         HelperNode.OnInput += e =>
         {

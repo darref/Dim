@@ -21,20 +21,20 @@ public partial class DimensionsManager : Control
 {
 	// base scene
 	private const string DimensionScenePath = "res://Dimensions/dimension.tscn";
+	private readonly float _changingViewTweenDuration = 0.5f;
 	private readonly List<Dimension> _dimensions = new();
 	private AudioStreamPlayer2D _audioPlayer = new();
 	private AudioStreamPlayer2D _audioPlayerAmbiance = new();
-	private readonly float _changingViewTweenDuration = 0.5f;
 	private PackedScene _dimensionScene;
 	private bool _enabledNavigation = true;
 
 	private bool _isChangingView;
+	private Tween _tween;
 
 	// slider
 	private Control _viewContainer;
-	private  int CurrentIndex = 0;
+	private int CurrentIndex;
 	public EnumDimensionSwitchingMode DimensionChangeMode = EnumDimensionSwitchingMode.Fade;
-	private Tween _tween;
 
 	// dim
 	[Export] public int NumberOfDimensionToCreateInitially { get; set; } = 10;
@@ -47,7 +47,7 @@ public partial class DimensionsManager : Control
 	[Export] public Array<AudioStreamEntry> EntriesAmbiance { get; set; } = new();
 
 
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		//frontend
 		WindowManager.Instance.ResizeFinished += UpdateLayoutGeneral;
@@ -80,16 +80,17 @@ public partial class DimensionsManager : Control
 		CreateDimensionsAndApplyAllLaws();
 		//apply initial fronted !!! important to initialize with thes calls !!!
 		CurrentIndex = 0;
-		for(int index = 0; index < 4; index++)
+		for (var index = 0; index < 4; index++)
 			SetChangingDimensionMode(DimensionChangeMode == EnumDimensionSwitchingMode.Slide
 				? EnumDimensionSwitchingMode.Fade
 				: EnumDimensionSwitchingMode.Slide);
 
+		
+		SleepAllDimensionsAndTheirRulesExceptCurrent();
+
 		foreach (var dimension in _dimensions)
 			GD.Print(dimension.Name + " --- order: " + dimension._dimOrder + " --- index: " + _dimensions.IndexOf(dimension));
 	}
-
-
 
 
 	//Frontend//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,26 +123,25 @@ public partial class DimensionsManager : Control
 	private void UpdateLayoutSliderMode()
 	{
 		Vector2 windowSize = DisplayServer.ScreenGetSize();
-		
+
 		CustomMinimumSize = windowSize;
 		Position = Vector2.Zero;
 
 		// Utilise une copie triée de _dimensions
 		var sortedDimensions = _dimensions.OrderBy(d => d._dimOrder).ToList();
 		var currentDimension = sortedDimensions.FirstOrDefault(d => d._dimOrder == CurrentIndex);
-		int currentIndexInSorted = sortedDimensions.IndexOf(currentDimension);
+		var currentIndexInSorted = sortedDimensions.IndexOf(currentDimension);
 		_viewContainer.Position = new Vector2(-currentIndexInSorted * windowSize.X, 0);
 		_viewContainer.CustomMinimumSize = new Vector2(windowSize.X * sortedDimensions.Count, windowSize.Y);
 
-		for (int i = 0; i < sortedDimensions.Count; i++)
+		for (var i = 0; i < sortedDimensions.Count; i++)
 		{
 			var dimension = sortedDimensions[i];
 			dimension.LayoutMode = 0;
 			dimension.CustomMinimumSize = windowSize;
 			dimension.Position = new Vector2(i * windowSize.X, 0f);
 			dimension.ZIndex = 100;
-			dimension.Modulate = new Color(1, 1, 1,1);
-
+			dimension.Modulate = new Color(1, 1, 1);
 		}
 	}
 
@@ -152,6 +152,8 @@ public partial class DimensionsManager : Control
 			return;
 
 		GD.Print($"Sliding Dimension from {CurrentIndex} to {targetedDimension._dimOrder}");
+		foreach (var dim in _dimensions)
+			dim.Pause(true);
 		_isChangingView = true;
 
 		var tween = CreateTween();
@@ -165,14 +167,14 @@ public partial class DimensionsManager : Control
 		var targetIndexInSorted = sortedDimensions.IndexOf(targetedDimension);
 
 		// Étape 3 : calcul du décalage
-		var toPos = new Vector2(-(targetIndexInSorted) * windowSize.X, fromPos.Y);
+		var toPos = new Vector2(-targetIndexInSorted * windowSize.X, fromPos.Y);
 		tween.TweenProperty(_viewContainer, "position", toPos, changingViewTweenDuration);
 
 
 		tween.TweenCallback(Callable.From(() =>
 		{
 			CurrentIndex = targetedDimension._dimOrder;
-
+			SleepAllDimensionsAndTheirRulesExceptCurrent( );
 			_isChangingView = false;
 			if (EntriesMusic.Count > 0)
 			{
@@ -203,18 +205,15 @@ public partial class DimensionsManager : Control
 			dimension.Size = windowSize;
 			dimension._subViewportRoot.TransparentBg = true;
 			dimension.ZIndex = dimension._dimOrder == CurrentIndex ? 100 : 0;
-			dimension.Modulate = dimension._dimOrder == CurrentIndex ? new Color(1, 1, 1,1) : new Color(1, 1, 1, 0);
+			dimension.Modulate = dimension._dimOrder == CurrentIndex ? new Color(1, 1, 1) : new Color(1, 1, 1, 0);
 		}
-		
+
 		var currentDimension = _dimensions.Where(d => d._dimOrder == CurrentIndex).FirstOrDefault();
 		foreach (var dim in _dimensions)
 		{
-			dim.ZIndex = dim == currentDimension  ? 100 : 0;
-			dim.SetModulate( dim == currentDimension  ? new Color(1,1,1,1) : new Color(1,1,1,0));
+			dim.ZIndex = dim == currentDimension ? 100 : 0;
+			dim.SetModulate(dim == currentDimension ? new Color(1, 1, 1) : new Color(1, 1, 1, 0));
 		}
-			
-
-		
 	}
 
 	private void FadeToView(Dimension dimensionTargeted, float changingViewTweenDuration)
@@ -228,6 +227,8 @@ public partial class DimensionsManager : Control
 			return;
 		}
 
+		foreach (var dim in _dimensions)
+				dim.Pause(true);
 		_isChangingView = true;
 
 		var currentDimension = _dimensions.Where(d => d._dimOrder == CurrentIndex).FirstOrDefault();
@@ -251,6 +252,7 @@ public partial class DimensionsManager : Control
 
 			// Mise à jour manuelle de CurrentIndex pour qu’il corresponde à la nouvelle
 			CurrentIndex = dimensionTargeted._dimOrder;
+			SleepAllDimensionsAndTheirRulesExceptCurrent( );
 			_isChangingView = false;
 		}));
 	}
@@ -285,18 +287,36 @@ public partial class DimensionsManager : Control
 		if (!_dimensions.Where(d => d._dimOrder == targetIndex).Any()) return;
 		if (CurrentIndex == targetIndex) return;
 		UpdateLayoutGeneral();
+		
 		switch (DimensionChangeMode)
 		{
 			case EnumDimensionSwitchingMode.Slide:
-				SlideToView(findDimensionByOrder(targetIndex), _changingViewTweenDuration);
+				SlideToView(FindDimensionByOrder(targetIndex), _changingViewTweenDuration);
 				break;
 			case EnumDimensionSwitchingMode.Fade:
-				FadeToView(findDimensionByOrder(targetIndex), _changingViewTweenDuration);
+				FadeToView(FindDimensionByOrder(targetIndex), _changingViewTweenDuration);
 				break;
 		}
+		
+		
 	}
 
-	public Dimension findDimensionByOrder(int order)
+	private  void SleepAllDimensionsAndTheirRulesExceptCurrent()
+	{
+		var currentDimension = FindDimensionByOrder(CurrentIndex);
+		foreach (var dim in _dimensions)
+			if(dim == currentDimension)
+				dim.Pause(false);
+			else
+			{
+				dim.Pause(true);
+			}
+		
+			
+		
+	}
+	
+	public Dimension FindDimensionByOrder(int order)
 	{
 		return _dimensions.Where(d => d._dimOrder == order).FirstOrDefault();
 	}
@@ -335,7 +355,7 @@ public partial class DimensionsManager : Control
 			var ruleInited = rule.Duplicate() as DimensionRule;
 			ruleInited.Init(dimension._subViewportRoot, rule.ApplyOnStart, rule.ApplyOnEnd,
 				rule.ApplyPermanently);
-			dimension.AddLRuleIfNotAlreadyContained(ruleInited);
+			dimension.AddRuleIfNotAlreadyContained(ruleInited);
 		}
 
 
@@ -347,7 +367,7 @@ public partial class DimensionsManager : Control
 				var ruleInited = rule.Duplicate() as DimensionRule;
 				ruleInited.Init(dimension._subViewportRoot, rule.ApplyOnStart, rule.ApplyOnEnd,
 					rule.ApplyPermanently);
-				dimension.AddLRuleIfNotAlreadyContained(ruleInited);
+				dimension.AddRuleIfNotAlreadyContained(ruleInited);
 			}
 	}
 

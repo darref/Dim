@@ -5,30 +5,46 @@ namespace Dim.Rules;
 
 public partial class RuleCommonNodeMethodsHelper : Node
 {
-    // Délégués personnalisés
-    public Action<float>? OnProcessFrame;
-    public Action<InputEvent>? OnInput;
-    public Action? OnReady;
-    public Action? OnExit;
+    private DimensionRule _dimensionRuleRef;
+    public Action OnExit;
+    public Action<InputEvent> OnInput;
+    public Action<float> OnProcessFrame;
+    public Action OnReady;
 
+    public void Init(DimensionRule dimensionRule)
+    {
+        _dimensionRuleRef = dimensionRule;
+    }
     public override void _Ready()
     {
-        OnReady?.Invoke();
-        SetProcess(true);
-        SetProcessInput(true);
+        // GD.Print($"appelé malgré {EnabledEvents}");
+        if (_dimensionRuleRef.Enabled )
+            OnReady?.Invoke();
+        
+        
+        
     }
 
     public override void _Process(double delta)
     {
-        OnProcessFrame?.Invoke((float)delta);
+        // GD.Print($"appelé malgré {EnabledEvents}");
+        if (_dimensionRuleRef.Enabled )
+            OnProcessFrame?.Invoke((float)delta);
     }
 
     public override void _Input(InputEvent @event)
     {
-        OnInput?.Invoke(@event);
+        // GD.Print($"appelé malgré {EnabledEvents}");
+        if (_dimensionRuleRef.Enabled )
+            OnInput?.Invoke(@event);
     }
+
     public override void _ExitTree()
     {
-        OnExit?.Invoke();
+        // GD.Print($"appelé malgré {EnabledEvents}");
+        if (_dimensionRuleRef.Enabled )
+            OnExit?.Invoke();
     }
+
+    
 }

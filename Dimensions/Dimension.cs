@@ -10,7 +10,7 @@ public partial class Dimension : TextureRect
 {
 	public int _dimOrder;
 	public SubViewport _subViewportRoot;
-	public Array<DimensionRule> _dimensionRules = new ();
+	public Array<DimensionRule> _dimensionRules  = new Array<DimensionRule>();
 
 
 	public void Init(int dim)
@@ -64,14 +64,32 @@ public partial class Dimension : TextureRect
 		}
 	}
 
-	public bool AddLRuleIfNotAlreadyContained(DimensionRule rule)
+	public bool AddRuleIfNotAlreadyContained(DimensionRule rule)
 	{
-		if(_dimensionRules.Where(r => r.ResourceName == rule.ResourceName).Any()) return false;
+		if (_dimensionRules.Any(r => r.GetType() == rule.GetType()))
+		{
+			GD.PrintErr($"La regle {rule.GetType()} ne peut etre ajoutée car elle existe deja dans la dimension {_dimOrder}D");
+			return false;
+		}
+
 		_dimensionRules.Add(rule);
 		return true;
 	}
 
 
 
+	public void Pause(bool pause)
+	{
+		foreach (var rule in _dimensionRules)
+		{
+			rule.Enabled = !pause;
+
+			if (rule.HelperNode != null)
+			{
+				rule.HelperNode.SetProcess(!pause);
+				rule.HelperNode.SetProcessInput(!pause);
+			}
+		}
+	}
 
 }

@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://c2wp4rxrwv1nr" path="res://Rules/SpecificRules/UnifiedColorScreenRule.cs" id="7_ynf5e"]
 [ext_resource type="Script" uid="uid://7dwmfr62ohug" path="res://Rules/SpecificRules/RecordMouseMotionAndAddLineOnClick.cs" id="8_hptm8"]
 
-[sub_resource type="Resource" id="Resource_344ge"]
+[sub_resource type="Resource" id="Resource_6bp64"]
 script = ExtResource("6_344ge")
 DotColor = Color(1, 0, 0, 1)
 OneShot = false
@@ -22,10 +22,30 @@ Enabled = true
 ConsoleMessagesEnabled = false
 metadata/_custom_type_script = "uid://dtl5b1n57o1kw"
 
-[sub_resource type="Resource" id="Resource_ynf5e"]
+[sub_resource type="Resource" id="Resource_344ge"]
 script = ExtResource("3_21xkr")
 DimensionOrder = 0
-Rules = Array[Object]([SubResource("Resource_344ge")])
+Rules = Array[Object]([SubResource("Resource_6bp64")])
+metadata/_custom_type_script = "uid://cw20givsw4vua"
+
+[sub_resource type="Resource" id="Resource_ynf5e"]
+script = ExtResource("8_hptm8")
+LineColor = Color(0.5, 0.5, 0.5, 1)
+DoesDeletingLineDestroyHigherDimensions = false
+MouseButtonForEndRecording = 1
+MouseButtonForResetRecording = 2
+ApplyOnStart = false
+ApplyOnEnd = false
+ApplyPermanently = false
+PermanentApplyingFrequency = 0.05
+Enabled = true
+ConsoleMessagesEnabled = false
+metadata/_custom_type_script = "uid://7dwmfr62ohug"
+
+[sub_resource type="Resource" id="Resource_hptm8"]
+script = ExtResource("3_21xkr")
+DimensionOrder = 1
+Rules = Array[Object]([SubResource("Resource_ynf5e")])
 metadata/_custom_type_script = "uid://cw20givsw4vua"
 
 [sub_resource type="Resource" id="Resource_d1ilt"]
@@ -44,31 +64,11 @@ metadata/_custom_type_script = "uid://7dwmfr62ohug"
 
 [sub_resource type="Resource" id="Resource_6iyac"]
 script = ExtResource("3_21xkr")
-DimensionOrder = 1
+DimensionOrder = -1
 Rules = Array[Object]([SubResource("Resource_d1ilt")])
 metadata/_custom_type_script = "uid://cw20givsw4vua"
 
-[sub_resource type="Resource" id="Resource_jkdf5"]
-script = ExtResource("8_hptm8")
-LineColor = Color(0.5, 0.5, 0.5, 1)
-DoesDeletingLineDestroyHigherDimensions = false
-MouseButtonForEndRecording = 1
-MouseButtonForResetRecording = 2
-ApplyOnStart = false
-ApplyOnEnd = false
-ApplyPermanently = false
-PermanentApplyingFrequency = 0.05
-Enabled = true
-ConsoleMessagesEnabled = false
-metadata/_custom_type_script = "uid://7dwmfr62ohug"
-
-[sub_resource type="Resource" id="Resource_wsu2k"]
-script = ExtResource("3_21xkr")
-DimensionOrder = -1
-Rules = Array[Object]([SubResource("Resource_jkdf5")])
-metadata/_custom_type_script = "uid://cw20givsw4vua"
-
-[sub_resource type="Resource" id="Resource_k12tt"]
+[sub_resource type="Resource" id="Resource_fdnlq"]
 script = ExtResource("7_ynf5e")
 ChosenColor = Color(1, 1, 1, 1)
 RandomColor = true
@@ -80,9 +80,9 @@ Enabled = true
 ConsoleMessagesEnabled = false
 metadata/_custom_type_script = "uid://c2wp4rxrwv1nr"
 
-[sub_resource type="Resource" id="Resource_h1bgf"]
+[sub_resource type="Resource" id="Resource_jkdf5"]
 script = ExtResource("7_6bp64")
-Rules = Array[Object]([SubResource("Resource_k12tt")])
+Rules = Array[Object]([SubResource("Resource_fdnlq")])
 metadata/_custom_type_script = "uid://i1rrh3lh26i1"
 
 [node name="Main" type="Node"]
@@ -100,5 +100,5 @@ offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_jjvhh")
-OrderLaws = Array[ExtResource("3_21xkr")]([SubResource("Resource_ynf5e"), SubResource("Resource_6iyac"), SubResource("Resource_wsu2k")])
-TransdimensionalLaws = Array[ExtResource("7_6bp64")]([SubResource("Resource_h1bgf")])
+OrderLaws = Array[ExtResource("3_21xkr")]([SubResource("Resource_344ge"), SubResource("Resource_hptm8"), SubResource("Resource_6iyac")])
+TransdimensionalLaws = Array[ExtResource("7_6bp64")]([SubResource("Resource_jkdf5")])
