@@ -32,6 +32,7 @@ public partial class UnifiedColorScreenRule : DimensionRule
 		};
 
 		// Ajouter le ColorRect comme premier enfant du SubViewport
+		_existingColorRect = colorRect;
 		SubViewportRootRef.AddChild(colorRect);
 		SubViewportRootRef.MoveChild(colorRect, 0); // Le place en premier dans la hiérarchie
 
@@ -39,8 +40,7 @@ public partial class UnifiedColorScreenRule : DimensionRule
 
 	protected override void UnApplyPonctually()
 	{
-		if(_existingColorRect != null)
-			_existingColorRect.QueueFree();
+		
 	}
 
 	protected override void AddCommonHelperNodeMethods()

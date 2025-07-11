@@ -100,5 +100,5 @@ offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_jjvhh")
-OrderLaws = Array[ExtResource("3_21xkr")]([SubResource("Resource_344ge"), SubResource("Resource_hptm8"), SubResource("Resource_6iyac")])
-TransdimensionalLaws = Array[ExtResource("7_6bp64")]([SubResource("Resource_jkdf5")])
+OrderLaws = [SubResource("Resource_344ge"), SubResource("Resource_hptm8"), SubResource("Resource_6iyac")]
+TransdimensionalLaws = [SubResource("Resource_jkdf5")]

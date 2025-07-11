@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_e8tfm")
 ChosenColor = Color(0, 0, 0, 1)
-RandomColor = false
-ApplyOnStart = false
+RandomColor = true
+ApplyOnStart = true
 ApplyOnEnd = false
 ApplyPermanently = false
 PermanentApplyingFrequency = 0.05

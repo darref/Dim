@@ -39,6 +39,11 @@ public abstract partial class DimensionRule : Resource
         HelperNode = new RuleCommonNodeMethodsHelper();
         HelperNode.Init(this);
         HelperNode.Name = "HelperFor" + GetType().Name;
+        //
+        HelperNode.OnReady += ApplyPonctually;
+        HelperNode.OnExit += ApplyPonctually;
+        HelperNode.OnProcessFrame += (float delta) => { ApplyPonctually(); };
+        //
         AddCommonHelperNodeMethods();
         DimensionNodeRef.AddChild(HelperNode);
 
